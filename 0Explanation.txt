@@ -1,0 +1,24 @@
+the 3Dee is already complied. 
+
+to run:
+
+$./threedee infile
+
+the normal output massage is:
+
+    STOP  *** DETECTED K.E. L.E. ZERO ,NORMAL EXIT *** statement executed
+
+the output file is outfile
+
+the make_infile.cpp can generate infile from replacing some value from infile.temp
+
+the read_out.cpp can read the cross sectio (inculding PWIA, DWIA) and Analysing power (A00n0)
+it will save the reading in test.txt
+
+the 3DeeGee.cpp can generate 2D data, whihc combined the make_infile.cpp and read_out.cpp with some modification. 
+  ---notics that 3Dee is in Nucleus frame
+  
+the 3knockout.cpp combined the knockout.cpp with 3DeeGee.cpp
+  ---this is in lab frame
+
+##### update at 2012/4/23 17:29  Ryan
