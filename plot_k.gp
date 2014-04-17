@@ -7,7 +7,7 @@
 #print 'pngIO = '.pngIO
 
 ##### SETTING ################################
-filename = "paraOut_16O_JA1.0_JB1.5_angk60_angNN70_Sp10.0.dat"
+filename = "paraOut_16O_JA1.0_JB1.5_angk120_angNN70_Sp10.0.dat"
 
 ##### Plotting script ########################
 reset #reset all graphic setting

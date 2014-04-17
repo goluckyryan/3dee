@@ -1,3 +1,4 @@
+numPlot = 4
 
 #-------------- set mulit plot <row>, <col>
 set multiplot layout 2, 1 title filename
@@ -8,8 +9,8 @@ set rmargin 3
 set grid
 
 #--- 1st plot
-set origin 0,0.75
-set size 1, 0.25
+set origin 0,(numPlot-1.)/numPlot
+set size 1, 1./numPlot
 unset xlabel
 set ylabel 'DWIA'
 set yrange[0:0.25]
@@ -26,8 +27,8 @@ plot filename using 1:($10<10?$10:0)     title "1 x 1s1/2" lc rgb "#FF0000" lw 2
            "" using 1:($30<10?9*$30:0)   title "9 x 1d3/2" lc rgb "#0000FF" lw 2  
 
 #--- 2nd plot
-set origin 0, 0.5
-set size 1, 0.25
+set origin 0, (numPlot-2.)/numPlot
+set size 1, 1./numPlot
 set ylabel 'A00n0'
 set xtics 0,20,300.
 set yrange [-1:1]
@@ -42,8 +43,8 @@ plot  0 lc rgb "#000000", \
            "" using 1:($31<10?$31:0) lc rgb "#0000FF" lw 2
 
 #--- 3rd plot
-set origin 0,0.25
-set size 1, 0.25
+set origin 0,(numPlot-3.)/numPlot
+set size 1, 1./numPlot
 set ylabel 'Pn000'
 set xtics 0,20,300.
 set yrange [-1:1]
@@ -58,9 +59,10 @@ plot  0 lc rgb "#000000", \
            "" using 1:($32<10?$32:0) lc rgb "#0000FF" lw 2
 
 #--- 4th plot
-set origin 0,0
-set size 1, 0.25
+set origin 0, (numPlot-4.)/numPlot
+set size 1, 1./numPlot
 set xlabel 'k [MeV/c]'
+unset xlabel
 set ylabel 'P0n00'
 set xtics 0,20,300.
 set yrange [-1:1]

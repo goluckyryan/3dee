@@ -88,6 +88,8 @@ float Angle(float *V){
 float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta_NN, float Sp){
     
   float mass = Nucleus_Mass(Z, MA);
+
+  if ( mass == -404) return(0);
   
   theta_k = theta_k/rad2deg;
   theta_NN = theta_NN/rad2deg;
