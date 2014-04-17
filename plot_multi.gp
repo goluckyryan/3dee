@@ -1,7 +1,7 @@
 numPlot = 4
 
 #-------------- set mulit plot <row>, <col>
-set multiplot layout 2, 1 title filename
+set multiplot layout numPlot, 1 title filename
 set tmargin 0
 #set bmargin 0
 set lmargin 10

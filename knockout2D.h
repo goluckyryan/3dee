@@ -177,7 +177,21 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   output[5] = Angle(P1L)*rad2deg;
   output[6] = P2L[0] - mp;
   output[7] = Angle(P2L)*rad2deg;
-  
+
+  /*  // display 
+  PrintV(Pi, " Pi");
+  PrintV(Pk, " Pk");
+  PrintV(Pt, " Pt");
+  PrintV(Pr, " Pr");
+  PrintV(P1, " P1");
+  PrintV(P2, " P2");
+
+  printf("Etotal : %10.3f, 2*mp:%10.3f,  p1c: %10.3f \n", Etotal,2*mp, p1c);
+  PrintV(Pic, " Pic");
+  PrintV(Pkc, " Pkc");
+  PrintV(P1c, " P1c");
+  PrintV(P2c, " P2c");
+  */
   //delete pointer
   delete Pi;
   delete Pt;

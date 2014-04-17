@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
   int L = 0;
   float J = 0.5;
 
-  int totCount = 6*300*180/kStep/angStep;
+  int totCount = 6*300*360/kStep/angStep;
 
   float *jaco = new float[2]; // jacobian for x-sec transform
   float *output = new float[8]; // knockout output 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
   //########################### start looping
   int count = 0;
   for (float k=0; k <300; k+=kStep){
-    for (float angk = 0; angk<180; angk+=angStep){
+    for (float angk = 0; angk<360; angk+=angStep){
 
       // use knockout2D.h to calculate Tc thetac and thetad;
       output = Knockout2D(MA, Z,  Ti, k, angk, theta_NN, BE);
@@ -106,6 +106,10 @@ int main(int argc, char *argv[]){
       printf("%6d[%4.1f%%]| k:%6.2f angk:%6.2f| T_c:%9.3f, theta_c:%9.3f, theta_d:%9.3f\n",
              count, count*100./totCount, k, angk, output[0], output[1], output[3]);
 
+      if ( isnan(output[0])) {
+        printf(" skipped due to impossible kinematic. \n");
+        continue;
+      }
 
       // save parameters + readout
       fprintf(paraOut,"%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
