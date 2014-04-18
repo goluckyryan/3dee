@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
       fprintf(paraOut,"%12.6f%12.6f%12.6f%12.6f",DWIA ,A00n0, Pn000, P0n00); 
       
       //Delete outfile
-      remove("outfile");
+      //remove("outfile");
 
     }
 

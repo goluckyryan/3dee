@@ -8,8 +8,8 @@
 
 ##### SETTING ################################
 filename = "paraOut_16O_JA1.0_JB1.5_angNN60_Sp10.0.dat"
-sizeX = 2000
-sizeY = 1200
+sizeX = 1200
+sizeY = 900
 ##### Plotting script ########################
 reset #reset all graphic setting
 print '============================================'

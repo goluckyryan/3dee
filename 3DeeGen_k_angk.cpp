@@ -79,15 +79,15 @@ int main(int argc, char *argv[]){
   fprintf(paraOut, "#A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "#BE=%5.1f  Ti=%9.3f theta_NN=%9.3f\n", BE, Ti, theta_NN);
   fprintf(paraOut, "#%119s", ""); 
-  for (int ID = 1; ID<=6 ; ID++) fprintf(paraOut, "%12s%12s%12s%12s", "DWIA", "A00n0", "Pn000", "P0n00") ; fprintf(paraOut, "\n");
-  fprintf(paraOut, "#%11d", 1); for (int i = 2; i <= 34 ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
+  for (int ID = 1; ID<=6 ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
+  fprintf(paraOut, "#%11d", 1); for (int i = 2; i <= 10+2*6 ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
   fprintf(paraOut, "%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
              "k", "angk", "T1", "theta1", "T2", "theta2", "T_c","theta_c", "T_d", "theta_d");
   for (int ID= 1; ID <=6 ; ID++){
     orbit(ID, N, L, J);
     char NLJ[9];
     sprintf(NLJ, "%1d%1s%1d/2", N, symbolL(L), (int)(2*J));
-    for (int i = 1; i <= 4; i++){
+    for (int i = 1; i <= 2; i++){
       fprintf(paraOut,"%12s", NLJ);  
     }
   }
@@ -134,10 +134,10 @@ int main(int argc, char *argv[]){
         read_outfile(57);
      
         // save parameters + readout
-        fprintf(paraOut,"%12.6f%12.6f%12.6f%12.6f",DWIA ,A00n0, Pn000, P0n00); 
+        fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
       
         //Delete outfile
-        remove("outfile");
+        //        remove("outfile");
 
       }
       fprintf(paraOut,"\n");
@@ -147,6 +147,10 @@ int main(int argc, char *argv[]){
   fprintf(paraOut,"##################################\n");
 
   fclose(paraOut);
+  // append infile to  output file
+  char command[100];
+  sprintf(command,"cat %s >> %s","infile", filename);
+  system(command);
 
   //########################## display result
   time_t Tend=time(0);
@@ -155,11 +159,8 @@ int main(int argc, char *argv[]){
   printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
   printf("  JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf("  assume Binding energy of orbital proton is %7.2f \n", BE );
-  printf(" output: %s \n", filename);  
-  // append infile to  output file
-  char command[100];
-  sprintf(command,"cat %s >> %s","infile", filename);
-  system(command);
+  printf("  output: %s \n", filename);  
+
   
   return 0;
 

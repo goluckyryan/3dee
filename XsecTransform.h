@@ -48,7 +48,7 @@ float* Jacobian(float mass, float Tinc, float theta, float beta){
     jaco[0] =  MomtA*MomtA*MomtA/Momt/Momt/gamma/(Momt + Energy*beta*cos(theta*deg2rad));   // d(sigma)/d(Omega)
 
     //The Journal of Chemical Physics 69, 1737 (1978)
-    //jaco[0] = MomtA*MomtA*Energy/Momt/Momt/EnergyA;    // d^2(sigma)/dv/d(Omega)
+    //jaco[0] = MomtA*MomtA*Energy/Momt/Momt/EnergyA;    // d^3(sigma)/dv/d(Omega)
     jaco[1] = thetaA;
 
     return jaco;

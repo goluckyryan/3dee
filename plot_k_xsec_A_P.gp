@@ -22,7 +22,7 @@ set style data lines
 set key autotitle columnhead
 set xrange [0:300]
 
-load "plot_multi.gp"
+load "plot_k_xsec_A_P_multi.gp"
 
 
 #---------- pause and wait for eneter to stop
@@ -34,7 +34,7 @@ if (MOUSE_KEY == 115){
   set term png small size sizeX, sizeY
   set output pngName
   print 'png output -> '.pngName
-  load "plot_multi.gp"
+  load "plot_k_xsec_A_P_multi.gp"
 }else {
   print 'no output'
 }
