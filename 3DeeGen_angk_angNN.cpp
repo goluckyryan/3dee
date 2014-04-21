@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
   float *output = new float[8]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "paraOut_%2d%s_JA%3.1f_JB%3.1f_k%d_Sp%4.1f.dat",  MA, symbolZ(Z), JA, JB, (int)k, BE);
+  sprintf(filename, "../result/paraOut_%2d%s_JA%3.1f_JB%3.1f_k%d_Sp%4.1f.dat",  MA, symbolZ(Z), JA, JB, (int)k, BE);
   
 //#############################  display input condition
   printf("===========================\n");
