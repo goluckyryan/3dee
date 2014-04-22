@@ -154,7 +154,7 @@ int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float
 
 }
 
-void read_outfile(int linePWIA){
+int read_outfile(int linePWIA){
 
   string line[84];
   ifstream file_in;
@@ -180,6 +180,8 @@ void read_outfile(int linePWIA){
 
   linePWIA += lineAdj;
 
+  if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0) return 10;
+
   /* printf("%2d | %2d |%s \n", linePWIA   , line[linePWIA   ].length(), line[linePWIA].c_str());
   printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
   printf("%2d | %2d |%s \n", linePWIA+6 , line[linePWIA+6 ].length(), line[linePWIA+6].c_str());
@@ -195,4 +197,6 @@ void read_outfile(int linePWIA){
   Ay = Pn000;
    
   //printf("PWIA = %f, DWIA = %f, Ay = %f\n", PWIA, DWIA, Ay);
+
+  return 0;
 }

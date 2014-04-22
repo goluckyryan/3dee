@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
         system("./threedee infile");
      
         // read_outfile : xsec + Ay
-        read_outfile(57);
+        if (read_outfile(57) == 10) continue;
      
         // save parameters + readout
         fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
