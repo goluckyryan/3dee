@@ -166,7 +166,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   P2L = Lorentz(P2, -beta, 0);
   PrL = Lorentz(Pr, -beta, 0);
     
-  float *output = new float[9];
+  float *output = new float[8];
     
   output[0] = P1[0] - mp; // T_1
   output[1] = Angle(P1)*rad2deg; // theta_1
@@ -174,11 +174,9 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   output[3] = Angle(P2)*rad2deg; // theta_2
 
   output[4] = P1L[0] - mp;
-  output[5] = 180 - Angle(P1L)*rad2deg ; // invert the z-axis 
+  output[5] = Angle(P1L)*rad2deg;
   output[6] = P2L[0] - mp;
-  output[7] = 180 + Angle(P2L)*rad2deg;
-
-  output[8] = -beta;
+  output[7] = Angle(P2L)*rad2deg;
 
   /*  // display 
   PrintV(Pi, " Pi");

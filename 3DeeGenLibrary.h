@@ -21,7 +21,7 @@ char* symbolL(int L){
   case 4: return "g";break;
   case 5: return "h";break;
   case 6: return "i";break;
-  }
+ }
 }
 
 char* symbolZ(int Z){
@@ -200,3 +200,48 @@ int read_outfile(int linePWIA){
 
   return 0;
 }
+
+int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2){
+
+  // return 1 for accepted, 0 for rejected
+
+  if(T1 < 30 || T2<30) return 0;
+
+  if(theta1 < 20 || theta1 > 70) return 0;
+  if(theta2 < 20 || theta2 > 70) return 0;
+
+  return 1;
+
+}
+
+int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2){
+
+  // return 1 for accepted, 0 for rejected
+
+  if(T1 < 30 || T2<30) return 0;
+
+  if(theta1 < 20 || theta1 > 70) return 0;
+  if(theta2 < 20 || theta2 > 70) return 0;
+
+  return 1;
+
+}
+
+float mwdcY(float x){
+  // for MWDC-L , x -> -x
+  // for MWDC-R , x is normal
+
+  if (x >= -170 && x < 200.*2./3.-170.){
+    return 3.*(x+170.)/2.;
+  }else if (x >= 200.*2./3.-170. && x < 200.*(-2./3.)+950.){
+    return 200;
+  }else if (x >= 200.*(-2./3.)+950. && x <= 950){
+    return (x-950)*(-3./2.);
+  }else{
+    return 0;
+  }
+    
+
+}
+
+
