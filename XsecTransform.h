@@ -63,57 +63,94 @@ float* Jacobian(float mass, float Tinc, float theta, float beta){
 
 }
 
-float* Jacobian2(float T1, float theta1, float T2, float theta2, float beta){
-    
+float* Jacobian2(float T_c, float theta_c, float T_d, float theta_d, float beta){
+    // frome CM to Lab  
     const float mass = 938.272; // proton
 
-    theta2 = abs(theta2);
+    //T_c, theta_c  = Lab energy and angle
+    //theta_d = Lab angle
 
-    float Energy1 = mass + T1;
-    float Momt1 = sqrt(2*mass*T1+T1*T1);
-    float Momt1x = Momt1*sin(theta1*deg2rad);
-    float Momt1z = Momt1*cos(theta1*deg2rad);
+    //A, B are CM frame
 
-    float Energy2 = mass + T2;
-    float Momt2 = sqrt(2*mass*T2+T2*T2);
-    float Momt2x = Momt2*sin(theta2*deg2rad);
-    float Momt2z = Momt2*cos(theta2*deg2rad);
+    theta_d = abs(theta_d);
+
+    float Energy_c = mass + T_c;
+    float Momt_c = sqrt(2*mass*T_c+T_c*T_c);
+    float Momt_cx = Momt_c*sin(theta_c*deg2rad);
+    float Momt_cz = Momt_c*cos(theta_c*deg2rad);
+
+    float Energy_d = mass + T_d;
+    float Momt_d = sqrt(2*mass*T_d+T_d*T_d);
+    float Momt_dx = Momt_d*sin(theta_d*deg2rad);
+    float Momt_dz = Momt_d*cos(theta_d*deg2rad);
 
     float gamma = 1/sqrt(1-beta*beta);
     
-    // Lorentz transform of A
+    // Lorentz transform to Lab
     float *trans = new float[5];
 
-    trans = LorentzTransform(mass, T1, theta1, beta);
+    trans = LorentzTransform(mass, T_c, theta_c, beta);
     
-    float EnergyA = trans[0];
-    float MomtA   = trans[3];
-    float thetaA  = trans[4];
+    float Energy_1 = trans[0];
+    float Momt_1   = trans[3];
+    float theta_1  = trans[4];
 
-    trans = LorentzTransform(mass, T2, theta2, beta);
+    trans = LorentzTransform(mass, T_d, theta_d, beta);
     
-    float EnergyB = trans[0];
-    float MomtB   = trans[3];
-    float thetaB  = trans[4];
+    float Energy_2 = trans[0];
+    float Momt_2   = trans[3];
+    float theta_2  = trans[4];
     
-    // Jacobian frome C fram to A frame;
+    // Jacobian frome CM fram to Lab frame;
     float *jaco = new float[2];
 
-    float jaco1 = MomtA*EnergyA/Momt1/Energy1; // J(EA,OmegaA, E1, Omega1)
+    float jaco1 = Momt_1*Energy_1/Momt_c/Energy_c; // J(E_c,Omega_c, E_1, Omega_1)
 
-    float jaco2 = MomtB*MomtB*MomtB/Momt2/Momt2/gamma/(Momt2 + Energy2*beta*cos(theta2*deg2rad)); // J(OmegaB. Omega2)
+    float jaco2 = Momt_2*Momt_2*Momt_2/Momt_d/Momt_d/gamma/abs(Momt_d + Energy_d*beta*cos(theta_d*deg2rad)); // J(Omega_d. Omega_2)
 
-    //jaco[0] =  MomtA*MomtA*MomtA/Momt/Momt/gamma/(Momt + Energy*beta*cos(theta*deg2rad));   // d(sigma)/d(Omega)
-
-    //The Journal of Chemical Physics 69, 1737 (1978)
-    //jaco[0] = MomtA*MomtA*Energy/Momt/Momt/EnergyA;    // d^3(sigma)/dp/d(Omega)
-    //jaco[1] = thetaA;
-
-    //little modified // d^3(sigma)/dE/d(Omega)
     jaco[0] = jaco1*jaco2;
 
-    //
-    jaco[1] = thetaA; //in deg
+    //axuillary
+    jaco[1] = theta_1; //in deg 
+
+    return jaco;
+
+}
+
+float* Jacobian3(const float *output){
+    // frome CM to Lab  
+    const float mass = 938.272; // proton
+
+    // 0 = T_c, 1 = theta_c, 2 = T_d, 3 = theta_d //CM frame
+    // 4 , 5, 6, 7, // Lab frame
+    // 8 =  beta , from CM to Lab
+
+    float Energy_c = mass + output[0];
+    float Momt_c = sqrt(2*mass*output[0]+output[0]*output[0]);
+
+    float Energy_d = mass + output[2];
+    float Momt_d = sqrt(2*mass*output[2]+output[2]*output[2]);
+    float theta_d = abs(output[3]);
+
+    float beta = output[8];
+    float gamma = 1/sqrt(1-output[8]*output[8]);
+    
+    float Energy_1 = mass + output[4];
+    float Momt_1   = sqrt(2*mass*output[4]+output[4]*output[4]);
+    
+    float Momt_2   = sqrt(2*mass*output[5]+output[5]*output[5]);
+    
+    // Jacobian frome CM fram to Lab frame;
+    float *jaco = new float[2];
+
+    float jaco1 = Momt_1*Energy_1/Momt_c/Energy_c; // J(E_c,Omega_c, E_1, Omega_1)
+
+    float jaco2 = Momt_2*Momt_2*Momt_2/Momt_d/Momt_d/gamma/abs(Momt_d + Energy_d*beta*cos(theta_d*deg2rad)); // J(Omega_d. Omega_2)
+
+    jaco[0] = jaco1*jaco2;
+
+    //axuillary, not use
+    jaco[1] = jaco1; 
 
     return jaco;
 
