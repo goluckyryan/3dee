@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>  //atoi
+#include "constant.h"
 
 using namespace std;
 
@@ -21,8 +22,8 @@ double Nucleus_Mass(int Z, int A)
   ifstream myfile;
   int    flag=0;
 
-  const double mp = 938.272046;
-  const double mn = 939.565378;
+  //const double mp = 938.272046;
+  //const double mn = 939.565378;
 
   myfile.open(dataPath.c_str());
 

@@ -51,12 +51,11 @@ k = ki-k1-k2
 #include <iomanip>
 #include <stdio.h>  // standard I/O
 #include <stdlib.h> // standard General Utlilities Library
+#include "constant.h"
 #include "nuclei_mass.h"
 
 using namespace std; // declare a namespace "std", every variable in this code is inside "std"
 
-const float mp = 938.272;
-const float rad2deg = 57.29577951;
 //function___________________________________________________________________
 float* Lorentz(float *V, float beta, float theta){
   float *U = new float[3];

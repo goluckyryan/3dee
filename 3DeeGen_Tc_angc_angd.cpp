@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <cstring>
-#include "XsecTransform.h" //load Jacobian
+#include "constant.h"
+//#include "XsecTransform.h" //load Jacobian
 #include "knockout2D.h"
 #include "nuclei_mass.h"
 #include "3DeeGenLibrary.h" 

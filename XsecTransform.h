@@ -1,9 +1,8 @@
 #include <cmath> // math , enable simple math function
 #include <stdlib.h> // standard General Utlilities Library
+#include "constant.h"
 
 using namespace std;
-
-const float deg2rad = 3.14159/180;
 
 float* LorentzTransform(float mass, float Tinc, float theta, float beta){
 

@@ -1,4 +1,8 @@
+#ifndef THREEDEELibrary
+#define THREEDEELibrary
+
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <stdio.h>
 #include <cstring>
@@ -11,6 +15,16 @@ double Ay;
 double A00n0, Pn000, P0n00;
 
 //***********************************************************************************
+char* symbolL(int L);
+char* symbolZ(int Z);
+void orbit(int ID, int &N, int &L, float &J);
+int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d);
+int read_outfile(int linePWIA);
+int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2);
+int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2);
+float mwdcY(float x);
+float* RotY( float * V, float ang );
+
 //***********************************************************************************
 char* symbolL(int L){
   switch (L){
@@ -21,7 +35,7 @@ char* symbolL(int L){
   case 4: return "g";break;
   case 5: return "h";break;
   case 6: return "i";break;
- }
+  }
 }
 
 char* symbolZ(int Z){
@@ -183,10 +197,10 @@ int read_outfile(int linePWIA){
   if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0) return 10;
 
   /* printf("%2d | %2d |%s \n", linePWIA   , line[linePWIA   ].length(), line[linePWIA].c_str());
-  printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
-  printf("%2d | %2d |%s \n", linePWIA+6 , line[linePWIA+6 ].length(), line[linePWIA+6].c_str());
-  printf("%2d | %2d |%s \n", linePWIA+9 , line[linePWIA+9 ].length(), line[linePWIA+9].c_str());
-  printf("%2d | %2d |%s \n", linePWIA+10, line[linePWIA+10].length(), line[linePWIA+10].c_str());
+     printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
+     printf("%2d | %2d |%s \n", linePWIA+6 , line[linePWIA+6 ].length(), line[linePWIA+6].c_str());
+     printf("%2d | %2d |%s \n", linePWIA+9 , line[linePWIA+9 ].length(), line[linePWIA+9].c_str());
+     printf("%2d | %2d |%s \n", linePWIA+10, line[linePWIA+10].length(), line[linePWIA+10].c_str());
   */
   PWIA  = atof((line[linePWIA]).substr(23,15).c_str());
   DWIA  = atof((line[linePWIA+3]).substr(23,15).c_str());
@@ -205,7 +219,7 @@ int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2){
 
   // return 1 for accepted, 0 for rejected
 
-  if(T1 < 30 || T2<30) return 0;
+  if(T1 < 30 || T2<30 || T1>300 || T2 > 300) return 0;
 
   if(theta1 < 20 || theta1 > 70) return 0;
   if(theta2 < 20 || theta2 > 70) return 0;
@@ -218,10 +232,48 @@ int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta
 
   // return 1 for accepted, 0 for rejected
 
-  if(T1 < 30 || T2<30) return 0;
+  if(T1 < 30 || T2<30 || T1>300 || T2 > 300) return 0;
+  theta1 = theta1/rad2deg;
+  phi1   = phi1/rad2deg;
+  theta2 = theta2/rad2deg;
+  phi2   = phi2/rad2deg;
 
-  if(theta1 < 20 || theta1 > 70) return 0;
-  if(theta2 < 20 || theta2 > 70) return 0;
+  const float mwdcDis = 1022.37;
+  const float mwdcAng = 60/rad2deg;
+
+  // the vector to MWDC
+  float len1;
+  len1 = mwdcDis/(sin(theta1)*cos(phi1)*sin(mwdcAng)+cos(theta1)*cos(mwdcAng)); 
+  float v1[3];
+  v1[0] = len1*cos(phi1)*sin(theta1);
+  v1[1] = len1*sin(phi1)*sin(theta1);
+  v1[2] = len1*cos(theta1);
+
+  printf("len1:%10.3f, v1: {%10.3f, %10.3f, %10.3f}\n", len1, v1[0], v1[1], v1[2]);
+
+  float len2;
+  len2 = mwdcDis/(sin(theta2)*cos(phi2)*sin(-mwdcAng)+cos(theta2)*cos(mwdcAng)); 
+  float v2[3];
+  v2[0] = len2*cos(phi2)*sin(theta2);
+  v2[1] = len2*sin(phi2)*sin(theta2);
+  v2[2] = len2*cos(theta2);
+
+  printf("len2:%10.3f, v2: {%10.3f, %10.3f, %10.3f}\n", len2, v2[0], v2[1], v2[2]);
+  
+  float* vL = new float [3];
+  vL = RotY(v1, 60);
+  printf("vL: {%10.3f, %10.3f, %10.3f, %10.3f}\n", vL[0], vL[1], vL[2]);
+  printf("  mwdcY(%10.3f) %10.3f , Y %10.3f\n",-vL[0], mwdcY(-vL[0]), vL[1]);
+
+  float* vR = new float[3];
+  vR = RotY(v2, -60);
+  printf("vR: {%10.3f, %10.3f, %10.3f, %10.3f}\n", vR[0], vR[1], vR[2]);
+  printf("  mwdcY(%10.3f) %10.3f , Y %10.3f\n", vR[0], mwdcY(vR[0]), vR[1]);
+  
+  if ( mwdcY(-vL[0]) < vL[1] ) return 0; 
+  if ( mwdcY(vR[0]) < vR[1] ) return 0; 
+
+  printf("...... accpected ..... \n");
 
   return 1;
 
@@ -238,10 +290,22 @@ float mwdcY(float x){
   }else if (x >= 200.*(-2./3.)+950. && x <= 950){
     return (x-950)*(-3./2.);
   }else{
-    return 0;
+    return -1;
   }
-    
 
 }
 
+float* RotY( float * V, float ang ){
+  // Left Hand rotate in 3D
+  float *U = new float[3];
+  ang = ang/rad2deg;  
 
+  U[0] = V[0]*cos(ang) - V[2]*sin(ang);
+  U[1] = V[1];
+  U[2] = V[0]*sin(ang) + V[2]*cos(ang);
+
+  return U;
+}
+
+
+#endif
