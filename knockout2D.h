@@ -412,7 +412,6 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   P1L[1] = p1 * sin(theta_1);
   P1L[2] = p1 * cos(theta_1);
 
-  // something wrong with the formula
   float a = PiL[0] + PtL[0] - P1L[0];
   float mr = mass + Sp - mp;
   float b = mr*mr+ PtL[2]*PtL[2] + p1*p1 - 2*PtL[2]*P1L[2];
@@ -558,8 +557,8 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
 
 float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float theta_d, float Sp){
     
-  printf("---------------- knockout inv 3---------------------\n");
-  printf(" Tc: %10.5f, theta_c: %10.5f, theta_d: %10.5f, SP:%10.5f\n", Tc, theta_c, theta_d, Sp);
+  //printf("---------------- knockout inv 3---------------------\n");
+  //printf(" Tc: %10.5f, theta_c: %10.5f, theta_d: %10.5f, SP:%10.5f\n", Tc, theta_c, theta_d, Sp);
   float mass = Nucleus_Mass(Z, MA);
 
   if ( mass == -404) return(0);
@@ -603,6 +602,8 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
 
   float p2 = p2b;
 
+  float T2a = 0;
+  if ( p2a >= 0 ) T2a = sqrt(mp*mp + p2a*p2a)-mp;
   float T2 = sqrt(mp*mp + p2*p2)-mp;
 
   P2[0] = mp + T2;
@@ -661,11 +662,11 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   output[3] = T2; // Td
 
   output[4] = P1L[0] - mp;   // T1
-  output[5] = Angle(P1L)*rad2deg - 180; // theta_1 
+  output[5] = 180 - Angle(P1L)*rad2deg; // theta_1 
   output[6] = P2L[0] - mp;   // T2
-  output[7] = 180 - Angle(P2L)*rad2deg;  // theta_2
+  output[7] = 180 + Angle(P2L)*rad2deg;  // theta_2
 
-  output[8] = -beta;
+  output[8] = T2a;
 
   //float SpOnline = 0; 
 
@@ -676,7 +677,7 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   PrintV2D(PrL, " PrL");
   PrintV2D(P1L, " P1L");
   PrintV2D(P2L, " P2L");
-  //printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, 180-theta_1*rad2deg, T2, theta_2*rad2deg+180);
+  printf("T1:%10.4f, theta_1:%10.4f, T2:%10.4f, theta_2:%10.4f \n", output[4], output[5], output[6], output[7]);
   printf("----------------- Nuclues frame\n");
   PrintV2D(Pi, " Pi");
   PrintV2D(Pk, " Pk");
@@ -684,9 +685,9 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   PrintV2D(Pr, " Pr");
   PrintV2D(P1, " P1");
   PrintV2D(P2, " P2");
-  printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[4], output[5], output[6], output[7]);
-  printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", output[0],output[1], output[2], output[3]);
-  printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
+  printf("Tc:%10.4f, theta_c:%10.4f, theta_d:%10.4f, Sp:%7.3f \n", Tc, theta_c*rad2deg, theta_d*rad2deg, Sp);
+  printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Td:%10.5f\n", output[0],output[1], output[2], output[3]);
+  //printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
   PrintV2D(Pic, " Pic");
   PrintV2D(Pkc, " Pkc");
   PrintV2D(P1c, " P1c");

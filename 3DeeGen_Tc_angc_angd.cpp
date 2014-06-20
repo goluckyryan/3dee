@@ -57,17 +57,22 @@ int main(int argc, char *argv[]){
   int L = 0;
   float J = 0.5;
 
+  const int orbRange = 6;
+  const int TcStart = 10;
   const int TcRange = 300;
   const int angcRange = 180;
   const int angdRange = 180;
 
-  int TcNum   = (TcRange-1 - (TcRange-1)%TcStep)/TcStep+1;
-  int angcNum = (angcRange-1 - (angcRange-1)%angcStep)/angcStep+1;
-  int angdNum = (angdRange-1 - (angdRange-1)%angdStep)/angdStep+1;
 
-  printf("%3d, %3d, %3d\n",TcNum, angcNum, angdNum);
+  int totCount = 0;
 
-  int totCount = 6*TcNum*angcNum*angdNum;
+  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
+    for (float angc = 15; angc<=angcRange; angc+=angcStep){
+        for(float angd = 15; angd<=angdRange; angd+=angdStep){
+          totCount += orbRange;
+        }
+    }
+  }
 
   float *output = new float[9]; // knockout output 
 
@@ -89,11 +94,11 @@ int main(int argc, char *argv[]){
   // file header
   fprintf(paraOut, "#A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "#Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
-  fprintf(paraOut, "#%*s", 12*11,""); for (int ID = 1; ID<=6 ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
-  fprintf(paraOut, "#%12d", 1); for (int i = 2; i <= 10+2*6 ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
+  fprintf(paraOut, "#%*s", 12*11,""); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
+  fprintf(paraOut, "#%12d", 1); for (int i = 2; i <= 10+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
   fprintf(paraOut, "%13s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
           "Tc", "theta_c", "Td", "theta_d", "k", "thetak", "thetaNN", "T_1","theta_1", "T_2", "theta_2");
-  for (int ID= 1; ID <=6 ; ID++){
+  for (int ID= 1; ID <=orbRange ; ID++){
     orbit(ID, N, L, J);
     char NLJ[9];
     sprintf(NLJ, "%1d%1s%1d/2", N, symbolL(L), (int)(2*J));
@@ -107,23 +112,23 @@ int main(int argc, char *argv[]){
   //########################### start looping
   int count = 0;
   int effCount = 0;
-  for (float Tc=10; Tc <=TcRange+10; Tc+=TcStep){
+  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
     for (float angc = 15; angc<=angcRange; angc+=angcStep){
         for(float angd = 15; angd<=angdRange; angd+=angdStep){
 
           // use knockout2D.h to calculate Tc thetac and thetad;
-          output = Knockout2Dinv3(MA, Z,  Ti, Tc, angc, angd, Sp);
+          output = Knockout2Dinv3(MA, Z,  Ti, Tc, angc, -angd, Sp);
 
           if ( isnan(output[0])) {
-            printf(" --------- skipped due to impossible kinematic. \n");
-            count += 6;
+            //printf(" --------- skipped due to impossible kinematic. \n");
+            count += orbRange;
             continue;
           }
 
           // Accpetance Filter
-          if (  AccpetanceFilter2D(output[4], output[5], output[6], output[7])) {
-            printf(" Accpatance Filter| T1:%9.3f ang1:%9.3f T2:%9.3f ang2:%8.3f \n", output[4], output[5], output[6], output[7]);
-            count+= 6;
+          if (  bool jjj = !AccpetanceFilter2D(output[4], output[5], output[6], output[7])) {
+            //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%3.1f), T1:%9.3f ang1:%9.3f T2:%9.3f ang2:%8.3f \n",jjj, Tc, angc, -angd, output[4], output[5], output[6], output[7]);
+            count+= orbRange;
             continue;
           }
 
@@ -135,10 +140,10 @@ int main(int argc, char *argv[]){
                  output[4], output[5], output[6], output[7]);
          
           // save parameters + readout
-          fprintf(paraOut,"%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
+          fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
                   Tc, angc, output[3], -angd, output[0],output[1],output[2], output[4], output[5], output[6], output[7]);       
 
-          for (int ID=1; ID <=6; ID ++){
+          for (int ID=1; ID <=orbRange; ID ++){
             count ++;
             effCount ++;
             //orbit
@@ -157,7 +162,7 @@ int main(int argc, char *argv[]){
             fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
 
             if ( DWIA > 1) printf("\e[31m");
-            printf("                                                  DWIA(%1d%1s%1d/2):%14.10f \n", N, symbolL(L), (int)(2*J), DWIA);
+            printf("                                                                DWIA(%1d%1s%1d/2):%14.10f \n", N, symbolL(L), (int)(2*J), DWIA);
             if ( DWIA > 1) printf("\e[m");
             //Delete outfile
             //        remove("outfile");
@@ -165,7 +170,7 @@ int main(int argc, char *argv[]){
           }
           fprintf(paraOut, "\n");
       }
-      fprintf(paraOut,"\n");
+        //fprintf(paraOut,"\n");
     }
     //fprintf(paraOut,"\n");
   }
@@ -179,8 +184,8 @@ int main(int argc, char *argv[]){
 
   //########################## display result
   time_t Tend=time(0);
-  printf("\e[32m[%5.1f%%]========== Totol run time %10.0f sec = %5.1f min| speed:#%5.2f(%5.2f)/sec ===========\e[m\n",
-         count*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
+  printf("\e[32m[%5.1f%%]========== Totol run time %10.0f sec = %5.1f min = %5.1f hr| speed:#%5.2f(%5.2f)/sec ===========\e[m\n",
+         count*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
   printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
   printf("  JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf("  Tc step = %2d MeV, angc step = %2d, angd step = %2d, total loops = %10d \n", TcStep, angcStep, angdStep, totCount);
