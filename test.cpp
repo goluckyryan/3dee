@@ -9,7 +9,7 @@
 #include "3DeeGenLibrary.h"
 #include "XsecTransform.h"
 #include "knockout2D.h"
-//#include "knockout3D.h"
+#include "knockout3D.h"
 
 using namespace std;
 

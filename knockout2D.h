@@ -57,7 +57,7 @@ k = ki-k1-k2
 using namespace std; // declare a namespace "std", every variable in this code is inside "std"
 
 //function___________________________________________________________________
-float* Lorentz(float *V, float beta, float theta){
+float* Lorentz2D(float *V, float beta, float theta){
   float *U = new float[3];
     
   float gamma = 1/sqrt(1-beta*beta);
@@ -72,15 +72,15 @@ float* Lorentz(float *V, float beta, float theta){
 }
 
 
-void PrintV(float *V, string Vname){
+void PrintV2D(float *V, string Vname){
   printf("%10s : %10.3f, %10.3f, %10.3f\n", Vname.c_str(), V[0], V[1], V[2]); 
 }
 
-float Momentum(float *V){
+float Momentum2D(float *V){
   return sqrt(V[1]*V[1] + V[2]*V[2]);
 }
 
-float Mass(float *V){
+float Mass2D(float *V){
   return sqrt(V[0]*V[0] - V[1]*V[1] - V[2]*V[2]);
 }
 
@@ -132,11 +132,11 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   float *P2c = new float[3];
   float *Pkc = new float[3];
 
-  float betaPc = Momentum(Pc)/Pc[0];
+  float betaPc = Momentum2D(Pc)/Pc[0];
   float thetaPc = Angle(Pc);
     
-  Pic = Lorentz(Pi, -betaPc, thetaPc);
-  Pkc = Lorentz(Pk, -betaPc, thetaPc);
+  Pic = Lorentz2D(Pi, -betaPc, thetaPc);
+  Pkc = Lorentz2D(Pk, -betaPc, thetaPc);
     
   float thetaPic = Angle(Pic);
     
@@ -151,8 +151,8 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   P2c[1] = -P1c[1];
   P2c[2] = -P1c[2];
     
-  P1 = Lorentz(P1c, betaPc, thetaPc);
-  P2 = Lorentz(P2c, betaPc, thetaPc);
+  P1 = Lorentz2D(P1c, betaPc, thetaPc);
+  P2 = Lorentz2D(P2c, betaPc, thetaPc);
   
   // ########################### Lab Frame Inversed Kinematics
   float *PiL = new float[3];
@@ -161,13 +161,13 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   float *PtL = new float[3];
   float *PrL = new float[3];
     
-  float beta = Momentum(Pi)/Pi[0];
+  float beta = Momentum2D(Pi)/Pi[0];
     
-  PiL = Lorentz(Pi, -beta, 0);
-  PtL = Lorentz(Pt, -beta, 0);
-  P1L = Lorentz(P1, -beta, 0);
-  P2L = Lorentz(P2, -beta, 0);
-  PrL = Lorentz(Pr, -beta, 0);
+  PiL = Lorentz2D(Pi, -beta, 0);
+  PtL = Lorentz2D(Pt, -beta, 0);
+  P1L = Lorentz2D(P1, -beta, 0);
+  P2L = Lorentz2D(P2, -beta, 0);
+  PrL = Lorentz2D(Pr, -beta, 0);
     
   float *output = new float[9];
     
@@ -185,26 +185,26 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
 
   /*// display 
   printf("----------------- Lab frame\n");
-  PrintV(PiL, " PiL");
-  PrintV(PtL, " PtL");
-  PrintV(PrL, " PrL");
-  PrintV(P1L, " P1L");
-  PrintV(P2L, " P2L");
+  PrintV2D(PiL, " PiL");
+  PrintV2D(PtL, " PtL");
+  PrintV2D(PrL, " PrL");
+  PrintV2D(P1L, " P1L");
+  PrintV2D(P2L, " P2L");
   printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", output[4], output[5], output[6], output[7]);
   printf("----------------- Nuclues frame\n");
-  PrintV(Pi, " Pi");
-  PrintV(Pk, " Pk");
-  PrintV(Pt, " Pt");
-  PrintV(Pr, " Pr");
-  PrintV(P1, " P1");
-  PrintV(P2, " P2");
+  PrintV2D(Pi, " Pi");
+  PrintV2D(Pk, " Pk");
+  PrintV2D(Pt, " Pt");
+  PrintV2D(Pr, " Pr");
+  PrintV2D(P1, " P1");
+  PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[0], output[1], output[2], output[3]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", k, theta_k*rad2deg, theta_NN*rad2deg, Sp);
   printf("Etotal : %10.3f, 2*mp:%10.3f,  p1c:%10.3f, beta:%10.8f\n", Etotal,2*mp, p1c, beta);
-  PrintV(Pic, " Pic");
-  PrintV(Pkc, " Pkc");
-  PrintV(P1c, " P1c");
-  PrintV(P2c, " P2c");
+  PrintV2D(Pic, " Pic");
+  PrintV2D(Pkc, " Pkc");
+  PrintV2D(P1c, " P1c");
+  PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
   */
   //delete pointer
@@ -279,15 +279,15 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   Pt[1] = 0;
   Pt[2] = 0;
 
-  PtL = Lorentz(Pt, -beta, 0);
-  P1  = Lorentz(P1L, beta, 0);
-  P2  = Lorentz(P2L, beta, 0);
+  PtL = Lorentz2D(Pt, -beta, 0);
+  P1  = Lorentz2D(P1L, beta, 0);
+  P2  = Lorentz2D(P2L, beta, 0);
 
   PrL[0] = PiL[0]+PtL[0]-P1L[0]-P2L[0];
   PrL[1] = PiL[1]+PtL[1]-P1L[1]-P2L[1];
   PrL[2] = PiL[2]+PtL[2]-P1L[2]-P2L[2];
 
-  Pr = Lorentz(PrL, beta, 0);
+  Pr = Lorentz2D(PrL, beta, 0);
     
   Pk[0] = Pt[0] - Pr[0];
   Pk[1] = Pt[1] - Pr[1];
@@ -305,21 +305,21 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   float *P2c = new float[3];
   float *Pkc = new float[3];
 
-  float betaPc = Momentum(Pc)/Pc[0];
+  float betaPc = Momentum2D(Pc)/Pc[0];
   float thetaPc = Angle(Pc);
     
-  Pic = Lorentz(Pi, -betaPc, thetaPc);
-  Pkc = Lorentz(Pk, -betaPc, thetaPc);    
-  P1c = Lorentz(P1, -betaPc, thetaPc);
-  P2c = Lorentz(P2, -betaPc, thetaPc);
+  Pic = Lorentz2D(Pi, -betaPc, thetaPc);
+  Pkc = Lorentz2D(Pk, -betaPc, thetaPc);    
+  P1c = Lorentz2D(P1, -betaPc, thetaPc);
+  P2c = Lorentz2D(P2, -betaPc, thetaPc);
     
   //  ########################### Output
   float *output = new float[9];
     
-  output[0] = Momentum(Pk); // k
+  output[0] = Momentum2D(Pk); // k
   output[1] = Angle(Pk)*rad2deg; // theta_k
-  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum(Pic)/Momentum(P1c))*rad2deg; // theta_NN
-  output[3] = Mass(Pr) - mass + mp; // Sp
+  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum2D(Pic)/Momentum2D(P1c))*rad2deg; // theta_NN
+  output[3] = Mass2D(Pr) - mass + mp; // Sp
 
   output[4] = P1[0] - mp;   // Tc
   output[5] = Angle(P1)*rad2deg ; // theta_c 
@@ -333,26 +333,26 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
 
   /*  // display 
   printf("----------------- Lab frame\n");
-  PrintV(PiL, " PiL");
-  PrintV(PtL, " PtL");
-  PrintV(PrL, " PrL");
-  PrintV(P1L, " P1L");
-  PrintV(P2L, " P2L");
+  PrintV2D(PiL, " PiL");
+  PrintV2D(PtL, " PtL");
+  PrintV2D(PrL, " PrL");
+  PrintV2D(P1L, " P1L");
+  PrintV2D(P2L, " P2L");
   printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, 180-theta_1*rad2deg, T2, theta_2*rad2deg+180);
   printf("----------------- Nuclues frame\n");
-  PrintV(Pi, " Pi");
-  PrintV(Pk, " Pk");
-  PrintV(Pt, " Pt");
-  PrintV(Pr, " Pr");
-  PrintV(P1, " P1");
-  PrintV(P2, " P2");
+  PrintV2D(Pi, " Pi");
+  PrintV2D(Pk, " Pk");
+  PrintV2D(Pt, " Pt");
+  PrintV2D(Pr, " Pr");
+  PrintV2D(P1, " P1");
+  PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[4], output[5], output[6], output[7]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", output[0],output[1], output[2], output[3]);
   printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
-  PrintV(Pic, " Pic");
-  PrintV(Pkc, " Pkc");
-  PrintV(P1c, " P1c");
-  PrintV(P2c, " P2c");
+  PrintV2D(Pic, " Pic");
+  PrintV2D(Pkc, " Pkc");
+  PrintV2D(P1c, " P1c");
+  PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
   */
 
@@ -413,15 +413,14 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   P1L[2] = p1 * cos(theta_1);
 
   // something wrong with the formula
-  float a = mass*gamma - T1;
-  float b = mass*gamma*beta - p1*cos(theta_1);
+  float a = PiL[0] + PtL[0] - P1L[0];
   float mr = mass + Sp - mp;
-  float c = mr*mr+ b*b + p1*p1*sin(theta_1)*sin(theta_1);
-  float d = 2*p1*sin(theta_1)*sin(theta_2) - 2*b*cos(theta_2);
+  float b = mr*mr+ PtL[2]*PtL[2] + p1*p1 - 2*PtL[2]*P1L[2];
+  float d = 2*p1*cos(theta_1-theta_2) - 2*PtL[2]*cos(theta_2);
 
-  float A = d*d - 4*a*a;
-  float B = -2*(a*a + mp*mp - c)*d;
-  float C = (a*a - mp*mp- c)*(a*a - mp*mp- c);
+  float A = 4*a*a - d*d;
+  float B = 2*(a*a + mp*mp - b)*d;
+  float C = 4*a*a*mp*mp - (a*a + mp*mp- b)*(a*a + mp*mp- b);
 
   float p2_a = (-B+sqrt(B*B-4*A*C))/(2*A);
   float p2_b = (-B-sqrt(B*B-4*A*C))/(2*A);
@@ -457,15 +456,15 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   Pt[1] = 0;
   Pt[2] = 0;
 
-  PtL = Lorentz(Pt, -beta, 0);
-  P1  = Lorentz(P1L, beta, 0);
-  P2  = Lorentz(P2L, beta, 0);
+  PtL = Lorentz2D(Pt, -beta, 0);
+  P1  = Lorentz2D(P1L, beta, 0);
+  P2  = Lorentz2D(P2L, beta, 0);
 
   PrL[0] = PiL[0]+PtL[0]-P1L[0]-P2L[0];
   PrL[1] = PiL[1]+PtL[1]-P1L[1]-P2L[1];
   PrL[2] = PiL[2]+PtL[2]-P1L[2]-P2L[2];
 
-  Pr = Lorentz(PrL, beta, 0);
+  Pr = Lorentz2D(PrL, beta, 0);
     
   Pk[0] = Pt[0] - Pr[0];
   Pk[1] = Pt[1] - Pr[1];
@@ -483,21 +482,21 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   float *P2c = new float[3];
   float *Pkc = new float[3];
 
-  float betaPc = Momentum(Pc)/Pc[0];
+  float betaPc = Momentum2D(Pc)/Pc[0];
   float thetaPc = Angle(Pc);
     
-  Pic = Lorentz(Pi, -betaPc, thetaPc);
-  Pkc = Lorentz(Pk, -betaPc, thetaPc);    
-  P1c = Lorentz(P1, -betaPc, thetaPc);
-  P2c = Lorentz(P2, -betaPc, thetaPc);
+  Pic = Lorentz2D(Pi, -betaPc, thetaPc);
+  Pkc = Lorentz2D(Pk, -betaPc, thetaPc);    
+  P1c = Lorentz2D(P1, -betaPc, thetaPc);
+  P2c = Lorentz2D(P2, -betaPc, thetaPc);
     
   //  ########################### Output
   float *output = new float[9];
     
-  output[0] = Momentum(Pk); // k
+  output[0] = Momentum2D(Pk); // k
   output[1] = Angle(Pk)*rad2deg; // theta_k
-  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum(Pic)/Momentum(P1c))*rad2deg; // theta_NN
-  output[3] = Mass(Pr) - mass + mp; // Sp
+  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum2D(Pic)/Momentum2D(P1c))*rad2deg; // theta_NN
+  output[3] = Mass2D(Pr) - mass + mp; // Sp
 
   output[4] = P1[0] - mp;   // Tc
   output[5] = Angle(P1)*rad2deg ; // theta_c 
@@ -510,26 +509,26 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
 
   /* // display 
   printf("----------------- Lab frame\n");
-  PrintV(PiL, " PiL");
-  PrintV(PtL, " PtL");
-  PrintV(PrL, " PrL");
-  PrintV(P1L, " P1L");
-  PrintV(P2L, " P2L");
+  PrintV2D(PiL, " PiL");
+  PrintV2D(PtL, " PtL");
+  PrintV2D(PrL, " PrL");
+  PrintV2D(P1L, " P1L");
+  PrintV2D(P2L, " P2L");
   printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, 180-theta_1*rad2deg, T2, theta_2*rad2deg+180);
   printf("----------------- Nuclues frame\n");
-  PrintV(Pi, " Pi");
-  PrintV(Pk, " Pk");
-  PrintV(Pt, " Pt");
-  PrintV(Pr, " Pr");
-  PrintV(P1, " P1");
-  PrintV(P2, " P2");
+  PrintV2D(Pi, " Pi");
+  PrintV2D(Pk, " Pk");
+  PrintV2D(Pt, " Pt");
+  PrintV2D(Pr, " Pr");
+  PrintV2D(P1, " P1");
+  PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[4], output[5], output[6], output[7]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", output[0],output[1], output[2], output[3]);
   printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
-  PrintV(Pic, " Pic");
-  PrintV(Pkc, " Pkc");
-  PrintV(P1c, " P1c");
-  PrintV(P2c, " P2c");
+  PrintV2D(Pic, " Pic");
+  PrintV2D(Pkc, " Pkc");
+  PrintV2D(P1c, " P1c");
+  PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
   */
 
@@ -590,7 +589,7 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   P1[2] = p1*cos(theta_c);
 
   float mr = mass + Sp - mp;
-
+  //calculate Td
   float a = Pi[0] + Pt[0] - P1[0];
   float b = mr*mr + Pi[2]*Pi[2] +  p1*p1 - 2*Pi[2]*P1[2];
   float d = 2*p1*cos(theta_c-theta_d) - 2*Pi[2]*cos(theta_d);
@@ -633,11 +632,11 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
 
   float beta = Pi[2]/Pi[0];  
 
-  PiL = Lorentz(Pi, -beta, 0);
-  PtL = Lorentz(Pt, -beta, 0);
-  PrL = Lorentz(Pr, -beta, 0);
-  P1L = Lorentz(P1, -beta, 0);
-  P2L = Lorentz(P2, -beta, 0);
+  PiL = Lorentz2D(Pi, -beta, 0);
+  PtL = Lorentz2D(Pt, -beta, 0);
+  PrL = Lorentz2D(Pr, -beta, 0);
+  P1L = Lorentz2D(P1, -beta, 0);
+  P2L = Lorentz2D(P2, -beta, 0);
 
   // ########################### 2-body CM frame
   float *Pic = new float[3];
@@ -645,20 +644,20 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   float *P2c = new float[3];
   float *Pkc = new float[3];
 
-  float betaPc = Momentum(Pc)/Pc[0];
+  float betaPc = Momentum2D(Pc)/Pc[0];
   float thetaPc = Angle(Pc);
     
-  Pic = Lorentz(Pi, -betaPc, thetaPc);
-  Pkc = Lorentz(Pk, -betaPc, thetaPc);    
-  P1c = Lorentz(P1, -betaPc, thetaPc);
-  P2c = Lorentz(P2, -betaPc, thetaPc);
+  Pic = Lorentz2D(Pi, -betaPc, thetaPc);
+  Pkc = Lorentz2D(Pk, -betaPc, thetaPc);    
+  P1c = Lorentz2D(P1, -betaPc, thetaPc);
+  P2c = Lorentz2D(P2, -betaPc, thetaPc);
     
   //  ########################### Output
   float *output = new float[9];
     
-  output[0] = Momentum(Pk); // k
+  output[0] = Momentum2D(Pk); // k
   output[1] = Angle(Pk)*rad2deg; // theta_k
-  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum(Pic)/Momentum(P1c))*rad2deg; // theta_NN
+  output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum2D(Pic)/Momentum2D(P1c))*rad2deg; // theta_NN
   output[3] = T2; // Td
 
   output[4] = P1L[0] - mp;   // T1
@@ -672,26 +671,26 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
 
   /* // display 
   printf("----------------- Lab frame\n");
-  PrintV(PiL, " PiL");
-  PrintV(PtL, " PtL");
-  PrintV(PrL, " PrL");
-  PrintV(P1L, " P1L");
-  PrintV(P2L, " P2L");
+  PrintV2D(PiL, " PiL");
+  PrintV2D(PtL, " PtL");
+  PrintV2D(PrL, " PrL");
+  PrintV2D(P1L, " P1L");
+  PrintV2D(P2L, " P2L");
   //printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, 180-theta_1*rad2deg, T2, theta_2*rad2deg+180);
   printf("----------------- Nuclues frame\n");
-  PrintV(Pi, " Pi");
-  PrintV(Pk, " Pk");
-  PrintV(Pt, " Pt");
-  PrintV(Pr, " Pr");
-  PrintV(P1, " P1");
-  PrintV(P2, " P2");
+  PrintV2D(Pi, " Pi");
+  PrintV2D(Pk, " Pk");
+  PrintV2D(Pt, " Pt");
+  PrintV2D(Pr, " Pr");
+  PrintV2D(P1, " P1");
+  PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[4], output[5], output[6], output[7]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", output[0],output[1], output[2], output[3]);
   printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
-  PrintV(Pic, " Pic");
-  PrintV(Pkc, " Pkc");
-  PrintV(P1c, " P1c");
-  PrintV(P2c, " P2c");
+  PrintV2D(Pic, " Pic");
+  PrintV2D(Pkc, " Pkc");
+  PrintV2D(P1c, " P1c");
+  PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
   */
 

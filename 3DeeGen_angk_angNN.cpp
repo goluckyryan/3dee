@@ -120,7 +120,7 @@ int main(int argc, char *argv[]){
         orbit(ID, N, L, J);
 
         // make infile
-        make_infile(MA, Z, JA, JB,  Ti, N, L, J, BE, output[0], output[1], output[3]);
+        make_infile(MA, Z, JA, JB,  Ti, N, L, J, BE, output[0], output[1], output[3], 0);
 
         // Calulate the thetaINV_c and Jacobian for X-sec
         // jaco = Jacobian(938.272, output[0], output[1], -0.6465223); // for 23F in SHARAQ04

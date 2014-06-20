@@ -18,7 +18,7 @@ double A00n0, Pn000, P0n00;
 char* symbolL(int L);
 char* symbolZ(int Z);
 void orbit(int ID, int &N, int &L, float &J);
-int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d);
+int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
 int read_outfile(int linePWIA);
 int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2);
 int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2);
@@ -65,9 +65,9 @@ void orbit(int ID, int &N, int &L, float &J){
   }
 }
 
-int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d){
+int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d){
 
-  stringstream MAstr, ZAstr, Tastr, JAstr, JBstr, Nstr, Lstr, Jstr, BEstr, Tcstr, theta_cstr,theta_dstr;
+  stringstream MAstr, ZAstr, Tastr, JAstr, JBstr, Nstr, Lstr, Jstr, BEstr, Tcstr, theta_cstr,theta_dstr, ang_dstr;
   MAstr << MA;
   ZAstr<<Z;
   Tastr<<Ta;
@@ -80,6 +80,7 @@ int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float
   Tcstr<<Tc;
   theta_cstr<<theta_c;
   theta_dstr<<theta_d;
+  ang_dstr<<ang_d;
 
   if(theta_c <0){
     printf(" ### theta_c should be positive. \n");
@@ -144,16 +145,19 @@ int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float
   line[14]= line[14].replace(40,lengthBE,BEstr.str());
 
 
-  //line17 Tc, theta_c, theta_d
+  //line17 Tc, theta_c, theta_d, ang_d
   int lengthTc=(Tcstr.str()).length();
   int lengththeta_c=(theta_cstr.str()).length();
   int lengththeta_d=(theta_dstr.str()).length();
+  int lengthang_d=(ang_dstr.str()).length();
   line[17]=line[17].replace(0,10,"          "); //reset
   line[17]=line[17].replace(10,10,"          "); //reset
   line[17]=line[17].replace(20,10,"          "); //reset
+  line[17]=line[17].replace(30,10,"          "); //reset
   line[17]=line[17].replace(0,lengthTc,Tcstr.str());
   line[17]=line[17].replace(10,lengththeta_c,theta_cstr.str());
   line[17]=line[17].replace(20,lengththeta_d,theta_dstr.str());
+  line[17]=line[17].replace(30,lengthang_d, ang_dstr.str());
 
   // Save to infile
   ofstream file_out;

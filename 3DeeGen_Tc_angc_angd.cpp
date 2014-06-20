@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
   float J = 0.5;
 
   const int TcRange = 300;
-  const int angcRange = 360;
+  const int angcRange = 180;
   const int angdRange = 180;
 
   int TcNum   = (TcRange-1 - (TcRange-1)%TcStep)/TcStep+1;
@@ -127,16 +127,16 @@ int main(int argc, char *argv[]){
             continue;
           }
 
-          // make_infile
+          // print condition
           printf("\e[32m==== %6d[\e[31m%4.1f%%\e[32m]| Tc:%9.3f angc:%9.3f Td:%9.3f angd:%8.3f| k:%7.3f, theta_k:%7.3f, theta_NN:%7.3f \e[m\n",
-                 count, count*100./totCount, Tc, angc, output[3], angd, output[0], output[1], output[2]);
+                 count, count*100./totCount, Tc, angc, output[3], -angd, output[0], output[1], output[2]);
 
           printf("                                 T1:%9.3f, theta_1:%9.3f,T2:%9.3f, theta_2:%9.3f\n",
                  output[4], output[5], output[6], output[7]);
          
           // save parameters + readout
           fprintf(paraOut,"%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
-                  Tc, angc, output[3], angd, output[0],output[1],output[2], output[4], output[5], output[6], output[7]);       
+                  Tc, angc, output[3], -angd, output[0],output[1],output[2], output[4], output[5], output[6], output[7]);       
 
           for (int ID=1; ID <=6; ID ++){
             count ++;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]){
             orbit(ID, N, L, J);
 
             // make infile
-            make_infile(MA, Z, JA, JB,  Ti, N, L, J, Sp, output[4], output[5], output[7]);
+            make_infile(MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, 0);
 
             // run 3Dee code
             system("./threedee infile");
@@ -155,7 +155,10 @@ int main(int argc, char *argv[]){
           
             // save parameters + readout
             fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
-      
+
+            if ( DWIA > 1) printf("\e[31m");
+            printf("                                                  DWIA(%1d%1s%1d/2):%14.10f \n", N, symbolL(L), (int)(2*J), DWIA);
+            if ( DWIA > 1) printf("\e[m");
             //Delete outfile
             //        remove("outfile");
        

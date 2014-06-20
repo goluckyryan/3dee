@@ -149,7 +149,7 @@ int main(int argc, char *argv[]){
           orbit(1, N, L, J);
 
           // make infile
-          //make_infile(MA, Z, JA, JB,  Ti, N, L, J, BE, output[0], output[1], output[3]);
+          //make_infile(MA, Z, JA, JB,  Ti, N, L, J, BE, output[0], output[1], output[3], 0);
 
 
           // run 3Dee code
