@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
   float *output = new float[9]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f.dat",  MA, symbolZ(Z), Sp);
+  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_angc%03d_angd%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angcStep, angdStep);
   
 //#############################  display input condition
   printf("===========================\n");
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]){
                  output[4], output[5], output[6], output[7]);
          
           // save parameters + readout
-          fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
+          fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
                   Tc, angc, output[3], -angd, output[0],output[1],output[2], output[4], output[5], output[6], output[7]);       
 
           for (int ID=1; ID <=orbRange; ID ++){
