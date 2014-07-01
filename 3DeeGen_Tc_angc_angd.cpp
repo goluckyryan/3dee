@@ -92,11 +92,14 @@ int main(int argc, char *argv[]){
   FILE * paraOut;
   paraOut = fopen (filename, "w");
   // file header
-  fprintf(paraOut, "#A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
-  fprintf(paraOut, "#Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
+  fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
+  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
+  fprintf(paraOut, "#X%15s%2d MeV\n", "Tc step =", TcStep); 
+  fprintf(paraOut, "#Y%15s%2d deg\n", "angc step =", angcStep); 
+  fprintf(paraOut, "#Z%15s%2d deg\n", "angd step =", angdStep); 
   fprintf(paraOut, "#%*s", 12*11,""); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
   fprintf(paraOut, "#%12d", 1); for (int i = 2; i <= 10+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
-  fprintf(paraOut, "%13s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
+  fprintf(paraOut, "#%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
           "Tc", "theta_c", "Td", "theta_d", "k", "thetak", "thetaNN", "T_1","theta_1", "T_2", "theta_2");
   for (int ID= 1; ID <=orbRange ; ID++){
     orbit(ID, N, L, J);
@@ -187,7 +190,7 @@ int main(int argc, char *argv[]){
   printf("\e[32m[%5.1f%%]========== Totol run time %10.0f sec = %5.1f min = %5.1f hr| speed:#%5.2f(%5.2f)/sec ===========\e[m\n",
          count*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
   printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
-  printf("  JA = %3.1f,  JB = %3.1f\n", JA, JB);
+  printf("  JA = %3.1f, JB = %3.1f\n, Sp", JA, JB, Sp);
   printf("  Tc step = %2d MeV, angc step = %2d, angd step = %2d, total loops = %10d \n", TcStep, angcStep, angdStep, totCount);
   printf("  output: %s \n", filename);  
   printf("------------------------------------------------------\n");
