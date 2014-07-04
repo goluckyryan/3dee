@@ -19,31 +19,6 @@ P is for 4-momentum
 E is Total relativistic energy
 T is for Kinetic energy
 
-***************** Procedure
-we can transform the mulit-bpdy to 2-body scattering
-
-in nucleus frame
-A(a, 1 + 2) Resi = > Neo(a, 1) 2, such that Neo = A - Resi
-
-by Lorentz transform of center of momentum 4-vector of New and a
-
-then set the Theta_NN and Phi_NN in CM frame by rotation operator.
-
-transform back to nucleus frame and lab frame
-
-done
-
-***************** Reverse problem
-
-given Pi, P1, P2, find k, S, Theta_NN, Phi
-
-Pi={Ei,0,0,ki}
-P1 = {E1, k1*sin(Theta_P1), 0, k1*cos(Theta_P1)}
-P2 = {E2, k2*sin(Theta_P2)*cos(Phi_P2), k2*sin(Theta_P2)*sin(Phi_P2), k2*cos(Theta_P2)}
-
-S = sqrt((Ei+Mo-E1-E2)^2-(ki-k1-k2)^2)-Mo+mn
-
-k = ki-k1-k2
 ***********************************/
 
 #include <sstream> // enable string control
@@ -107,13 +82,19 @@ float Phi(float *V){
   return atan2(V[2], V[1]);
 }
 
+float DAng(float *V, float *U){
+  float dotproduct = V[1]*U[1]+V[2]*U[2]+V[3]*U[3];
+  dotproduct = dotproduct/Momentum(V)/Momentum(U);
+  return acos(dotproduct);
+}
+
 float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k, float theta_NN, float phi_NN, float Sp){
-    
-  printf("-----------------------------------\n");
+  /*  
+  printf("-----KNOCKOUT 3D-----------\n");
   printf("     k: %10.6f,     Sp: %10.6f \n", k, Sp);
   printf(" ang_k: %10.6f, ang_NN: %10.6f \n", theta_k, theta_NN);
   printf(" phi_k: %10.6f, phi_NN: %10.6f \n", phi_k, phi_NN);
-
+  */
   float mass = Nucleus_Mass(Z, MA);
 
   if ( mass == -404) return(0);
@@ -198,6 +179,7 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   float *P2L = new float[4];
   float *PtL = new float[4];
   float *PrL = new float[4];
+  float *PkL = new float[4];
     
   float beta = Momentum(Pi)/Pi[0];
     
@@ -206,30 +188,38 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   P1L = Lorentz(P1, -beta, 0, 0);
   P2L = Lorentz(P2, -beta, 0, 0);
   PrL = Lorentz(Pr, -beta, 0, 0);
+  
+  PkL[0] = PtL[0] - PrL[0];
+  PkL[1] = PtL[1] - PrL[1];
+  PkL[2] = PtL[2] - PrL[2];
+  PkL[3] = PtL[3] - PrL[3];
     
-  float *output = new float[11];
+  float *output = new float[13];
     
-  output[0] = P1[0] - mp; // T_c
+  output[0] = P1[0] - mp;        // T_c
   output[1] = Theta(P1)*rad2deg; // theta_c
-  output[2] = P2[0] - mp; // T_d
-  output[3] = - Theta(P2)*rad2deg; // theta_d
-  output[4] = atan2(P2[2],sqrt(P2[1]*P2[1]+P2[3]*P2[3]));// offplane angle, rotation around Kd x(Ka x Kc)
+  output[2] = Phi(P1)*rad2deg;
+  output[3] = P2[0] - mp;          // T_d
+  output[4] = - Theta(P2)*rad2deg; // theta_d
+  output[5] = Phi(P2)*rad2deg;
+  output[6] = output[2]-output[5];// offplane angle, rotation around Kd x(Ka x Kc)
 
-  output[5] = P1L[0] - mp;
-  output[6] = Theta(P1L)*rad2deg;
-  output[7] = Phi(P1L)*rad2deg;
-  output[8] = P2L[0] - mp;
-  output[9] = Theta(P2L)*rad2deg;
-  output[10] = Phi(P2L)*rad2deg;
+  output[7] = P1L[0] - mp;
+  output[8] = Theta(P1L)*rad2deg;
+  output[9] = Phi(P1L)*rad2deg;
+  output[10] = P2L[0] - mp;
+  output[11] = Theta(P2L)*rad2deg;
+  output[12] = Phi(P2L)*rad2deg;
 
   /*// display 
   printf("----------------- Lab frame\n");
   PrintV(PiL, " PiL");
   PrintV(PtL, " PtL");
   PrintV(PrL, " PrL");
+  PrintV(PkL, " PkL");
   PrintV(P1L, " P1L");
   PrintV(P2L, " P2L");
-  printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", output[4], output[5], output[6], output[7]);
+  printf("T1L:%10.4f, theta_1L:%10.4f, phi_1L:%10.4f \nT2L:%10.4f, theta_2L:%10.4f, phi_2L:%10.4f\n", output[7], output[8], output[9], output[10], output[11], output[12]);
   printf("----------------- Nuclues frame\n");
   PrintV(Pi, " Pi");
   PrintV(Pk, " Pk");
@@ -239,7 +229,7 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   PrintV(P2, " P2");
   PrintV(Pc, " Pc");
   printf("betaPc: %10.4f, thetaPc: %10.4f, phiPc: %10.4f \n", betaPc, thetaPc*rad2deg, phiPc*rad2deg);
-  printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[0], output[1], output[2], output[3]);
+  printf("Tc:%10.4f, theta_c:%10.4f, phi_c:%10.4f \nTd:%10.4f, theta_d:%10.4f, phi_d:%10.4f\noffplane ang:%10.4f\n", output[0], output[1], output[2], output[3], output[4], output[5], output[6]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", k, theta_k*rad2deg, theta_NN*rad2deg, Sp);
   printf("Etotal : %10.3f, 2*mp:%10.3f,  p1c:%10.3f, beta:%10.8f\n", Etotal,2*mp, p1c, beta);
   PrintV(Pcc, " Pcc");
@@ -247,7 +237,8 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   PrintV(Pkc, " Pkc");
   PrintV(P1c, " P1c");
   PrintV(P2c, " P2c");
-  printf("-----------------------------------\n");
+  printf("Dang(Pic, P1c) = %6.2f deg \n", DAng(Pic,P1c)*rad2deg );
+  printf("=======================================\n");
   */
   //delete pointer
   delete Pi;
@@ -268,26 +259,28 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   delete P1L;
   delete P2L;
   delete PrL;
+  delete PkL;
     
   return output;
 }
 
+//#################################################################################
 
-float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float phi_k, float theta_NN, float phi_NN, float Sp){
-    
-  printf("-----------------------------------\n");
-  printf("     k: %10.6f,     Sp: %10.6f \n", k, Sp);
-  printf(" ang_k: %10.6f, ang_NN: %10.6f \n", theta_k, theta_NN);
-  printf(" phi_k: %10.6f, phi_NN: %10.6f \n", phi_k, phi_NN);
-
+float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float phi_c, float theta_d, float phi_d, float Sp){
+  /*
+  printf("------KNOCKOUT3D inv3---------\n");
+  printf("   T_c: %10.6f,     Sp: %10.6f \n", Tc, Sp);
+  printf(" ang_c: %10.6f,  ang_d: %10.6f \n", theta_c, theta_d);
+  printf(" phi_c: %10.6f,  phi_d: %10.6f \n", phi_c, phi_d);
+  */
   float mass = Nucleus_Mass(Z, MA);
 
   if ( mass == -404) return(0);
   
-  theta_k = theta_k/rad2deg;
-  theta_NN = theta_NN/rad2deg;
-  phi_k = phi_k/rad2deg;
-  phi_NN = phi_NN/rad2deg;
+  theta_c = theta_c/rad2deg;
+  theta_d = theta_d/rad2deg;
+  phi_c = phi_c/rad2deg;
+  phi_d = phi_d/rad2deg;
  
   //  ########################### Nuclei's frame
   float *Pi = new float[4];
@@ -306,11 +299,45 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   Pt[1] = 0;
   Pt[2] = 0;
   Pt[3] = 0;
-    
-  Pr[0] = sqrt(pow(Sp+mass-mp,2)+k*k);
-  Pr[1] = k*sin(theta_k)*cos(phi_k);
-  Pr[2] = k*sin(theta_k)*sin(phi_k);
-  Pr[3] = k*cos(theta_k);
+
+  P1[0] = mp+Tc;
+  float pc = sqrt(2*mp*Tc+Tc*Tc);
+  P1[1] = pc*sin(theta_c)*cos(phi_c);
+  P1[2] = pc*sin(theta_c)*sin(phi_c);
+  P1[3] = pc*cos(theta_c);
+
+  //Find Td
+  float mr = mass + Sp - mp;
+  float a = Pi[0] + Pt[0] - P1[0];
+  float b = mr*mr + Pi[3]*Pi[3] +  pc*pc - 2*Pi[3]*P1[3];
+  float DD = cos(theta_c)*cos(theta_d)+sin(theta_c)*sin(theta_d)*cos(phi_c-phi_d);
+  float d = 2*pc*DD - 2*Pi[3]*cos(theta_d);
+
+  float A = 4*a*a-d*d;
+  float B = 2*(a*a+mp*mp-b)*d;
+  float C = 4*a*a*mp*mp-(a*a+mp*mp-b)*(a*a+mp*mp-b);
+
+  float p2a = (-B-sqrt(B*B-4*A*C))/2/A;
+  float p2b = (-B+sqrt(B*B-4*A*C))/2/A;
+
+  float p2 = p2b;
+
+  float Tda = 0;
+  if ( p2a >= 0 ) {
+    printf(" p2- = %10.4f\n", p2a);
+    Tda = sqrt(mp*mp + p2a*p2a)-mp;
+  }
+  float Td = sqrt(mp*mp + p2*p2)-mp;
+  
+  P2[0] = mp+Td;
+  P2[1] = p2*sin(theta_d)*cos(phi_d);
+  P2[2] = p2*sin(theta_d)*sin(phi_d);
+  P2[3] = p2*cos(theta_d);
+
+  Pr[0] = Pi[0] + Pt[0] - P1[0] - P2[0];
+  Pr[1] = Pi[1] + Pt[1] - P1[1] - P2[1];
+  Pr[2] = Pi[2] + Pt[2] - P1[2] - P2[2];
+  Pr[3] = Pi[3] + Pt[3] - P1[3] - P2[3];
     
   Pk[0] = Pt[0] - Pr[0];
   Pk[1] = Pt[1] - Pr[1];
@@ -335,29 +362,11 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   float phiPc = Phi(Pc);
   
   Pcc = Lorentz(Pc, -betaPc, thetaPc, phiPc);
-    
   Pic = Lorentz(Pi, -betaPc, thetaPc, phiPc);
   Pkc = Lorentz(Pk, -betaPc, thetaPc, phiPc);
+  P1c = Lorentz(P1, -betaPc, thetaPc, phiPc);
+  P2c = Lorentz(P2, -betaPc, thetaPc, phiPc);
     
-  float thetaPic = Theta(Pic);
-  float phiPic = Phi(Pic);
-    
-  float Etotal = sqrt(1-pow(betaPc,2))*(Pi[0]+Pk[0]); // CM frame total energy
-  float p1c = sqrt((Etotal-mp-mp)*(Etotal+mp+mp))/2;
-    
-  P1c[0] = sqrt(mp*mp + p1c*p1c);
-  P1c[1] = p1c*(cos(theta_NN)*cos(phiPic)*sin(thetaPic)+sin(theta_NN)*(cos(thetaPic)*cos(phiPic)*cos(phi_NN) - sin(phiPic)*sin(phi_NN)));
-  P1c[2] = p1c*(cos(theta_NN)*sin(phiPic)*sin(thetaPic)+sin(theta_NN)*(cos(thetaPic)*sin(phiPic)*cos(phi_NN) + cos(phiPic)*sin(phi_NN)));
-  P1c[3] = p1c*(cos(theta_NN)*cos(thetaPic) - cos(phi_NN) * sin(thetaPic) * sin(theta_NN));
-    
-  P2c[0] = P1c[0];
-  P2c[1] = -P1c[1];
-  P2c[2] = -P1c[2];
-  P2c[3] = -P1c[3];
-    
-  P1 = Lorentz(P1c, betaPc, thetaPc, phiPc);
-  P2 = Lorentz(P2c, betaPc, thetaPc, phiPc);
-  
   // ########################### Lab Frame Inversed Kinematics
   float *PiL = new float[4];
   float *P1L = new float[4];
@@ -372,18 +381,35 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   P1L = Lorentz(P1, -beta, 0, 0);
   P2L = Lorentz(P2, -beta, 0, 0);
   PrL = Lorentz(Pr, -beta, 0, 0);
-    
-  float *output = new float[8];
-    
-  output[0] = P1[0] - mp; // T_1
-  output[1] = Theta(P1)*rad2deg; // theta_1
-  output[2] = P2[0] - mp; // T_2
-  output[3] = Theta(P2)*rad2deg; // theta_2
 
-  output[4] = P1L[0] - mp;
-  output[5] = 180 - Theta(P1L)*rad2deg;
-  output[6] = P2L[0] - mp;
-  output[7] = Theta(P2L)*rad2deg -180;
+  //Find theta_NNm phi_NN
+  float theta_ic = Theta(Pic);
+  float phi_ic = Phi(Pic);
+
+  float * Prot = new float[4];
+  Prot[0] = 0;
+  Prot[1] =  (P1c[1]*cos(-phi_ic) - P1c[2]*sin(-phi_ic))*cos(-theta_ic)+P1c[3]*sin(-theta_ic);
+  Prot[2] =   P1c[1]*sin(-phi_ic) + P1c[2]*cos(-phi_ic);
+  Prot[3] = -(P1c[1]*cos(-phi_ic) - P1c[2]*sin(-phi_ic))*sin(-theta_ic)+P1c[3]*cos(-theta_ic);
+  
+  //===================================  
+  float *output = new float[13];
+    
+  output[0] = P1L[0] - mp; // T_1
+  output[1] = 180 - Theta(P1L)*rad2deg; // theta_1
+  output[2] = Phi(P1L)*rad2deg;
+  output[3] = P2L[0] - mp; // T_2
+  output[4] = 180 - Theta(P2L)*rad2deg; // theta_2
+  output[5] = Phi(P2L)*rad2deg;
+
+  output[6] = phi_c - phi_d;// offplane angle, rotation around Kd x(Ka x Kc)
+  output[7] = Td;
+  
+  output[8] = Momentum(Pk);//k
+  output[9] = Theta(Pr)*rad2deg;//theta_k
+  output[10] = Phi(Pr)*rad2deg;//phi_k
+  output[11] = Theta(Prot) *rad2deg;//theta_NN
+  output[12] = Phi(Prot)*rad2deg;//phi_NN
 
   /*// display 
   printf("----------------- Lab frame\n");
@@ -392,7 +418,7 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   PrintV(PrL, " PrL");
   PrintV(P1L, " P1L");
   PrintV(P2L, " P2L");
-  printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", output[4], output[5], output[6], output[7]);
+  printf("T1L:%10.4f, theta_1L:%10.4f, phi_1L:%10.4f\nT2L:%10.4f, theta_2L:%10.4f, phi_2L:%10.4f\n", output[0], output[1], output[2], output[3], output[4], output[5]);
   printf("----------------- Nuclues frame\n");
   PrintV(Pi, " Pi");
   PrintV(Pk, " Pk");
@@ -402,15 +428,15 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   PrintV(P2, " P2");
   PrintV(Pc, " Pc");
   printf("betaPc: %10.4f, thetaPc: %10.4f, phiPc: %10.4f \n", betaPc, thetaPc*rad2deg, phiPc*rad2deg);
-  printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[0], output[1], output[2], output[3]);
-  printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", k, theta_k*rad2deg, theta_NN*rad2deg, Sp);
-  printf("Etotal : %10.3f, 2*mp:%10.3f,  p1c:%10.3f, beta:%10.8f\n", Etotal,2*mp, p1c, beta);
+  printf("Tc:%10.4f, theta_c:%10.4f, phi_c:%10.4f\nTd:%10.4f, theta_d:%10.4f, phi_d:%10.4f\n", Tc, theta_c*rad2deg, phi_c*rad2deg, output[7], theta_d*rad2deg, phi_d*rad2deg);
+  printf("k : %10.3f, theta_k:%10.3f, phi_k%10.3f, theta_NN:%10.3f, phi_NN:%10.3f,Sp:%10.5f\n", output[8], output[9], output[10], output[11], output[12], Sp);
+  printf(" off plane angle: %10.4f deg\n", output[6]); 
   PrintV(Pcc, " Pcc");
   PrintV(Pic, " Pic");
   PrintV(Pkc, " Pkc");
   PrintV(P1c, " P1c");
   PrintV(P2c, " P2c");
-  printf("-----------------------------------\n");
+  printf("=====================================\n");
   */
   //delete pointer
   delete Pi;
@@ -431,9 +457,10 @@ float* Knockout3Dinv(int MA, int Z, float TKEA, float k, float theta_k, float ph
   delete P1L;
   delete P2L;
   delete PrL;
+
+  delete Prot;
     
   return output;
 }
-
 
 

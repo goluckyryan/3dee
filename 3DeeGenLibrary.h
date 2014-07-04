@@ -238,8 +238,9 @@ int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2){
 int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2){
 
   // return 1 for accepted, 0 for rejected
+  bool debug = 0;
 
-  if(T1 < 30 || T2<30 || T1>300 || T2 > 300) return 0;
+  if(T1 < 30 || T2<30 || T1>350 || T2 > 350) return 0;
   theta1 = theta1/rad2deg;
   phi1   = phi1/rad2deg;
   theta2 = theta2/rad2deg;
@@ -256,7 +257,7 @@ int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta
   v1[1] = len1*sin(phi1)*sin(theta1);
   v1[2] = len1*cos(theta1);
 
-  printf("len1:%10.3f, v1: {%10.3f, %10.3f, %10.3f}\n", len1, v1[0], v1[1], v1[2]);
+  if(debug)printf("len1:%10.3f, v1: {%10.3f, %10.3f, %10.3f}\n", len1, v1[0], v1[1], v1[2]);
 
   float len2;
   len2 = mwdcDis/(sin(theta2)*cos(phi2)*sin(-mwdcAng)+cos(theta2)*cos(mwdcAng)); 
@@ -265,22 +266,22 @@ int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta
   v2[1] = len2*sin(phi2)*sin(theta2);
   v2[2] = len2*cos(theta2);
 
-  printf("len2:%10.3f, v2: {%10.3f, %10.3f, %10.3f}\n", len2, v2[0], v2[1], v2[2]);
+  if(debug)printf("len2:%10.3f, v2: {%10.3f, %10.3f, %10.3f}\n", len2, v2[0], v2[1], v2[2]);
   
   float* vL = new float [3];
   vL = RotY(v1, 60);
-  printf("vL: {%10.3f, %10.3f, %10.3f, %10.3f}\n", vL[0], vL[1], vL[2]);
-  printf("  mwdcY(%10.3f) %10.3f , Y %10.3f\n",-vL[0], mwdcY(-vL[0]), vL[1]);
+  if(debug)printf("vL: {%10.3f, %10.3f, %10.3f}\n", vL[0], vL[1], vL[2]);
+  if(debug)printf("  mwdcY(%10.3f)=%10.3f , Y %10.3f\n",vL[0], mwdcY(-vL[0]), vL[1]);
 
   float* vR = new float[3];
   vR = RotY(v2, -60);
-  printf("vR: {%10.3f, %10.3f, %10.3f, %10.3f}\n", vR[0], vR[1], vR[2]);
-  printf("  mwdcY(%10.3f) %10.3f , Y %10.3f\n", vR[0], mwdcY(vR[0]), vR[1]);
+  if(debug)printf("vR: {%10.3f, %10.3f, %10.3f}\n", vR[0], vR[1], vR[2]);
+  if(debug)printf("  mwdcY(%10.3f)=%10.3f , Y %10.3f\n", vR[0], mwdcY(vR[0]), vR[1]);
   
-  if ( mwdcY(-vL[0]) < vL[1] ) return 0; 
-  if ( mwdcY(vR[0]) < vR[1] ) return 0; 
+  if ( mwdcY(-vL[0]) < abs(vL[1]) ) return 0; 
+  if ( mwdcY(vR[0]) < abs(vR[1]) ) return 0; 
 
-  printf("...... accpected ..... \n");
+  //printf("...... accpected ..... \n");
 
   return 1;
 
@@ -290,11 +291,11 @@ float mwdcY(float x){
   // for MWDC-L , x -> -x
   // for MWDC-R , x is normal
 
-  if (x >= -170 && x < 200.*2./3.-170.){
+  if (x >= -170 && x < 200.*2./3.-170.){ // (-170, -36.67), D= 133.333
     return 3.*(x+170.)/2.;
-  }else if (x >= 200.*2./3.-170. && x < 200.*(-2./3.)+950.){
+  }else if (x >= 200.*2./3.-170. && x < 200.*(-2./3.)+950.){ //(-36.67,816.67), D = 853.34
     return 200;
-  }else if (x >= 200.*(-2./3.)+950. && x <= 950){
+  }else if (x >= 200.*(-2./3.)+950. && x <= 950){ //(816.67, 950), D = 133.333
     return (x-950)*(-3./2.);
   }else{
     return -1;
