@@ -19,18 +19,15 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 9) {
+  if(argc < 5) {
     printf("===============Generating Flourine (p,pn) knockout data======================\n");
     printf("          Only for F(p,2p)O knockout [A(a,cd)b]\n");
     printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z JA JB BE dTc dAngc dAngd\n");
     printf("      MA = Mass number of isotop \n");
     printf("      Z  = charge number of isotop \n");
-    printf("      JA = spin of Flourine isotop\n");
-    printf("      JB = spin of Residual \n");
     printf("      BE = seperation energy \n");
     printf("     dTc = step of KE of proton 1 \n");
-    printf("   dAngc = step of ang_c of proton 1 \n");
-    printf("   dAngd = step of ang_d of proton 2 \n");
+    printf("    dAng = step of ang_c/d of proton 1/2 \n");
     exit(0);
   }
 
@@ -46,29 +43,29 @@ int main(int argc, char *argv[]){
   }
 
   int Z = atoi(argv[2]);
-  float JA = atof(argv[3]);
-  float JB = atof(argv[4]);
-  float Sp = atof(argv[5]);
-  int   TcStep = atoi(argv[6]);
-  int angcStep = atoi(argv[7]);
-  int angdStep = atoi(argv[8]);
+  float Sp = atof(argv[3]);
+  int  TcStep = atoi(argv[4]);
+  int angStep = atoi(argv[5]);
   
   int N = 0;
   int L = 0;
   float J = 0.5;
 
+  float JA = 1.0;
+  float JB = 1.5;
+
   const int orbRange = 6;
   const int TcStart = 10;
-  const int TcRange = 300;
+  const int TcEnd   = 300;
   const int angcRange = 180;
   const int angdRange = 180;
 
 
   int totCount = 0;
 
-  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
-    for (float angc = 15; angc<=angcRange; angc+=angcStep){
-        for(float angd = 15; angd<=angdRange; angd+=angdStep){
+  for (float Tc=TcStart; Tc <=TcEnd+TcStart; Tc+=TcStep){
+    for (float angc = 0; angc<=angcRange; angc+=angStep){
+        for(float angd = 0; angd<=angdRange; angd+=angStep){
           totCount += orbRange;
         }
     }
@@ -77,14 +74,14 @@ int main(int argc, char *argv[]){
   float *output = new float[9]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_angc%03d_angd%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angcStep, angdStep);
+  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep);
   
 //#############################  display input condition
   printf("===========================\n");
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
-  printf("Tc step = %2d MeV, angc step = %2d,  angd step = %2d, total loops = %10d \n", TcStep, angcStep, angdStep, totCount);
+  printf("Tc step = %2d MeV, angc step = %2d,  angd step = %2d, total loops = %10d \n", TcStep, angStep, angStep, totCount);
   printf(" output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 
@@ -94,9 +91,9 @@ int main(int argc, char *argv[]){
   // file header
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
-  fprintf(paraOut, "#X%15s%2d MeV\n", "Tc step =", TcStep); 
-  fprintf(paraOut, "#Y%15s%2d deg\n", "angc step =", angcStep); 
-  fprintf(paraOut, "#Z%15s%2d deg\n", "angd step =", angdStep); 
+  fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd+TcStart); 
+  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
+  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange); 
   fprintf(paraOut, "#%*s", 12*11,""); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
   fprintf(paraOut, "#%12d", 1); for (int i = 2; i <= 10+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
   fprintf(paraOut, "#%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
@@ -115,9 +112,9 @@ int main(int argc, char *argv[]){
   //########################### start looping
   int count = 0;
   int effCount = 0;
-  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
-    for (float angc = 15; angc<=angcRange; angc+=angcStep){
-        for(float angd = 15; angd<=angdRange; angd+=angdStep){
+  for (float Tc=TcStart; Tc <=TcEnd+TcStart; Tc+=TcStep){
+    for (float angc = 0; angc<=angcRange; angc+=angStep){
+        for(float angd = 0; angd<=angdRange; angd+=angStep){
 
           // use knockout2D.h to calculate Tc thetac and thetad;
           output = Knockout2Dinv3(MA, Z,  Ti, Tc, angc, -angd, Sp);
@@ -191,7 +188,7 @@ int main(int argc, char *argv[]){
          count*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
   printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
   printf("  JA = %3.1f, JB = %3.1f\n, Sp", JA, JB, Sp);
-  printf("  Tc step = %2d MeV, angc step = %2d, angd step = %2d, total loops = %10d \n", TcStep, angcStep, angdStep, totCount);
+  printf("  Tc step = %2d MeV, ang step = %2d, total loops = %10d \n", TcStep, angStep, totCount);
   printf("  output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 

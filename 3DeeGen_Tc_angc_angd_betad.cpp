@@ -59,17 +59,17 @@ int main(int argc, char *argv[]){
 
   const int orbRange = 6;
   const int TcStart = 10;
-  const int TcRange = 300;
+  const int TcEnd = 300;
   const int angcRange = 180;
   const int angdRange = 180;
-  const int phicRange = 25; //+-
-  const int phidRange = 25; //+-
+  const int phicRange = 26; //+-
+  const int phidRange = 26; //+-
 
   int totCount = 0;
 
-  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
-    for (float angc = 15; angc<=angcRange; angc+=angStep){
-      for(float angd = 15; angd<=angdRange; angd+=angStep){
+  for (float Tc=TcStart; Tc <=TcEnd+TcStart; Tc+=TcStep){
+    for (float angc = 0; angc<=angcRange; angc+=angStep){
+      for(float angd = 0; angd<=angdRange; angd+=angStep){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
             totCount += orbRange;
@@ -104,11 +104,11 @@ int main(int argc, char *argv[]){
   // file header
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
-  fprintf(paraOut, "#X%15s%2d MeV, Range (%6d, %6d)\n", "Tc step =", TcStep, TcStart, TcRange); 
-  fprintf(paraOut, "#Y%15s%2d deg, Range (%6d, %6d)\n", "angc step =", angStep, 0, angcRange); 
-  fprintf(paraOut, "#Z%15s%2d deg, Range (%6d, %6d)\n", "angd step =", angStep, 0, angdRange);
-  fprintf(paraOut, "#B%15s%2d deg, Range (%6d, %6d)\n", "phic step =", phiStep, -phicRange, phicRange);
-  fprintf(paraOut, "#A%15s%2d deg, Range (%6d, %6d)\n", "phid step =", phiStep, -phidRange, phidRange);
+  fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcStart, TcEnd); 
+  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
+  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
+  fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
+  fprintf(paraOut, "#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
   int paraNum = 18;
   fprintf(paraOut, "#%*s", 12*paraNum," cross section unit = ub"); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
   fprintf(paraOut, "#"); for (int i = 1; i <= paraNum+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
@@ -128,9 +128,9 @@ int main(int argc, char *argv[]){
   //########################### start looping
   int count = 0;
   int effCount = 0;
-  for (float Tc=TcStart; Tc <=TcRange+TcStart; Tc+=TcStep){
-    for (float angc = 15; angc<=angcRange; angc+=angStep){
-      for(float angd = 15; angd<=angdRange; angd+=angStep){
+  for (float Tc=TcStart; Tc <=TcEnd+TcStart; Tc+=TcStep){
+    for (float angc = 0; angc<=angcRange; angc+=angStep){
+      for(float angd = 0; angd<=angdRange; angd+=angStep){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
 
