@@ -9,7 +9,7 @@
 #include <math.h>
 #include <cstring>
 #include "constant.h"
-#include "XsecTransform.h" //load Jacobian
+//#include "XsecTransform.h" //load Jacobian
 #include "knockout2D.h"
 #include "3DeeGenLibrary.h" 
 
@@ -18,14 +18,12 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 9) {
+  if(argc < 7) {
     printf("===============Generating Flourine (p,pn) knockout data======================\n");
     printf("          Only for F(p,2p)O knockout [A(a,cd)b]\n");
     printf("Usage: ./3DeeGee_k.o MA Z JA JB theta_k theta_NN BE dk\n");
     printf("      MA = Mass number of isotop \n");
     printf("      Z  = charge number of isotop \n");
-    printf("      JA = spin of Flourine isotop\n");
-    printf("      JB = spin of Residual \n");
     printf(" theta_k = theta of resdiual \n");
     printf("theta_NN = 2-body CM scattering angle \n");    
     printf("      BE = binding energy of orbital proton \n");
@@ -42,24 +40,26 @@ int main(int argc, char *argv[]){
   case 25: Ti = 276.779; break;  
   }
   int Z = atoi(argv[2]);
-  float JA = atof(argv[3]);
-  float JB = atof(argv[4]);
-  float theta_k = atof(argv[5]);
-  float theta_NN = atof(argv[6]);
-  float BE = atof(argv[7]);
-  int  kStep = atoi(argv[8]);
+  float theta_k = atof(argv[3]);
+  float theta_NN = atof(argv[4]);
+  float BE = atof(argv[5]);
+  int  kStep = atoi(argv[6]);
   
   int N = 0;
   int L = 0;
   float J = 0.5;
 
-  int totCount = 6*300/kStep;
+  float JA = 1.0;
+  float JB = 1.5;
+
+  int kRange[2] = {0, 300};
+  int totCount = 6*(kRange[1]-kRange[0])/kStep;
 
   float *jaco = new float[2]; // jacobian for x-sec transform
   float *output = new float[8]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_JA%3.1f_JB%3.1f_angk%d_angNN%d_Sp%4.1f.dat",  MA, symbolZ(Z), JA, JB, (int)theta_k, (int)theta_NN, BE);
+  sprintf(filename, "../result/paraOut_%2d%s_angk%d_angNN%d_Sp%04.1f.dat",  MA, symbolZ(Z), (int)theta_k, (int)theta_NN, BE);
   
 //#############################  display input condition
   printf("===========================\n");
@@ -79,8 +79,8 @@ int main(int argc, char *argv[]){
   fprintf(paraOut, "#A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "#BE=%5.1f  Ti=%9.3f theta_k=%9.3f theta_NN=%9.3f\n", BE, Ti, theta_k, theta_NN);
   fprintf(paraOut, "#%107s", ""); 
-  for (int ID = 1; ID<=6 ; ID++) fprintf(paraOut, "%12s%12s%12s%12s", "DWIA", "A00n0", "Pn000", "P0n00") ; fprintf(paraOut, "\n");
-  fprintf(paraOut, "#%11d", 1); for (int i = 2; i <= 34 ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
+  for (int ID = 1; ID<=6 ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
+  fprintf(paraOut, "#%11d", 1); for (int i = 2; i <= 9 + 2*6 ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
   fprintf(paraOut, "%12s%12s%12s%12s%12s%12s%12s%12s%12s", "k", "T1", "theta1", "T2", "theta2", "T_c","theta_c", "T_d", "theta_d");
   for (int ID= 1; ID <=6 ; ID++){
     orbit(ID, N, L, J);
@@ -103,7 +103,6 @@ int main(int argc, char *argv[]){
     // make_infile
     printf("%6d[%4.1f%%]| k:%6.2f | T_c:%9.3f, theta_c:%9.3f, theta_d:%9.3f\n",
              count, count*100./totCount, k, output[0], output[1], output[3]);
-
 
     // save parameters + readout
     fprintf(paraOut,"%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
@@ -128,7 +127,7 @@ int main(int argc, char *argv[]){
       read_outfile(57);
      
       // save parameters + readout
-      fprintf(paraOut,"%12.6f%12.6f%12.6f%12.6f",DWIA ,A00n0, Pn000, P0n00); 
+      fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
       
       //Delete outfile
       //remove("outfile");

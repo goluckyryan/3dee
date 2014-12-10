@@ -19,14 +19,12 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 9) {
+  if(argc < 7) {
     printf("===============Generating Flourine (p,pn) knockout data======================\n");
     printf("          Only for F(p,2p)O knockout [A(a,cd)b]\n");
     printf("Usage: ./3DeeGee_k_angk.o MA Z JA JB BE dk dAngk dAngNN\n");
     printf("      MA = Mass number of isotop \n");
     printf("      Z  = charge number of isotop \n");
-    printf("      JA = spin of Flourine isotop\n");
-    printf("      JB = spin of Residual \n");
     printf("      BE = binding energy of orbital proton \n");
     printf("      dk = step of k \n");
     printf("   dAngk = step of angk \n");
@@ -45,16 +43,17 @@ int main(int argc, char *argv[]){
   }
 
   int Z = atoi(argv[2]);
-  float JA = atof(argv[3]);
-  float JB = atof(argv[4]);
-  float BE = atof(argv[5]);
-  int  kStep = atoi(argv[6]);
-  int angStep = atoi(argv[7]);
-  int angNNStep = atoi(argv[8]);
+  float BE = atof(argv[3]);
+  int  kStep = atoi(argv[4]);
+  int angStep = atoi(argv[5]);
+  int angNNStep = atoi(argv[6]);
   
   int N = 0;
   int L = 0;
   float J = 0.5;
+
+  float JA = 1.0;
+  float JB = 1.5;
 
   int totCount = 6*(300/kStep)*(360/angStep)*(140/angNNStep)- 6*(360/angStep-1)*(140/angNNStep);
 

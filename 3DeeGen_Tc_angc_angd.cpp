@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
   float JA = 1.0;
   float JB = 1.5;
 
-  const int orbRange = 6;
+  const int orbRange = 4;
   const int TcStart = 10;
   const int TcEnd   = 300;
   const int angcRange = 180;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]){
           }
 
           // Accpetance Filter
-          if (  bool jjj = !AccpetanceFilter2D(output[4], output[5], output[6], output[7])) {
+          if (  bool jjj = !AccpetanceFilter2D(output[4], output[5], output[6], -output[7])) {
             //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%3.1f), T1:%9.3f ang1:%9.3f T2:%9.3f ang2:%8.3f \n",jjj, Tc, angc, -angd, output[4], output[5], output[6], output[7]);
             count+= orbRange;
             continue;
@@ -137,11 +137,11 @@ int main(int argc, char *argv[]){
                  count, count*100./totCount, Tc, angc, output[3], -angd, output[0], output[1], output[2]);
 
           printf("                                 T1:%9.3f, theta_1:%9.3f,T2:%9.3f, theta_2:%9.3f\n",
-                 output[4], output[5], output[6], output[7]);
+                 output[4], output[5], output[6], -output[7]);
          
           // save parameters + readout
           fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
-                  Tc, angc, output[3], -angd, output[0],output[1],output[2], output[4], output[5], output[6], output[7]);       
+                  Tc, angc, output[3], -angd, output[0],output[1],output[2], output[4], output[5], output[6], -output[7]);       
 
           for (int ID=1; ID <=orbRange; ID ++){
             count ++;

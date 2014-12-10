@@ -71,7 +71,6 @@ float* Lorentz2D(float *V, float beta, float theta){
   return U;
 }
 
-
 void PrintV2D(float *V, string Vname){
   printf("%10s : %10.3f, %10.3f, %10.3f\n", Vname.c_str(), V[0], V[1], V[2]); 
 }
@@ -87,7 +86,7 @@ float Mass2D(float *V){
 float Angle(float *V){
   return atan2(V[1], V[2]);
 }
-
+// ###################################################
 float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta_NN, float Sp){
     
   float mass = Nucleus_Mass(Z, MA);
@@ -97,7 +96,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   theta_k = theta_k/rad2deg;
   theta_NN = theta_NN/rad2deg;
 
-  //  ########################### Nuclei's frame
+  //_______________________ Nuclei's frame
   float *Pi = new float[3];
   float *Pt = new float[3];
   float *P1 = new float[3];
@@ -112,7 +111,8 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   Pt[0] = mass;
   Pt[1] = 0;
   Pt[2] = 0;
-    
+  
+  // k is residual   
   Pr[0] = sqrt(pow(Sp+mass-mp,2)+k*k);
   Pr[1] = k*sin(theta_k);
   Pr[2] = k*cos(theta_k);
@@ -126,7 +126,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   Pc[1] = (Pi[1] + Pk[1])/2;
   Pc[2] = (Pi[2] + Pk[2])/2;
 
-  // ########################### 2-body CM frame
+  //_______________________ 2-body CM frame
   float *Pic = new float[3];
   float *P1c = new float[3];
   float *P2c = new float[3];
@@ -154,7 +154,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   P1 = Lorentz2D(P1c, betaPc, thetaPc);
   P2 = Lorentz2D(P2c, betaPc, thetaPc);
   
-  // ########################### Lab Frame Inversed Kinematics
+  //________________________ Lab Frame Inversed Kinematics
   float *PiL = new float[3];
   float *P1L = new float[3];
   float *P2L = new float[3];
@@ -168,22 +168,32 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   P1L = Lorentz2D(P1, -beta, 0);
   P2L = Lorentz2D(P2, -beta, 0);
   PrL = Lorentz2D(Pr, -beta, 0);
+
+  //______ invert the z-axis
+  PiL[2] = - PiL[2];
+  PtL[2] = - PtL[2];
+  P1L[2] = - P1L[2];
+  P2L[2] = - P2L[2];
+  PrL[2] = - PrL[2];
     
+  //_______________________________ output
   float *output = new float[9];
     
-  output[0] = P1[0] - mp; // T_1
-  output[1] = Angle(P1)*rad2deg; // theta_1
-  output[2] = P2[0] - mp; // T_2
-  output[3] = Angle(P2)*rad2deg; // theta_2
+  output[0] = P1[0] - mp;        // T_c
+  output[1] = Angle(P1)*rad2deg; // theta_c
+  output[2] = P2[0] - mp;        // T_d
+  output[3] = Angle(P2)*rad2deg; // theta_d
 
-  output[4] = P1L[0] - mp;
-  output[5] = 180 - Angle(P1L)*rad2deg ; // invert the z-axis 
-  output[6] = P2L[0] - mp;
-  output[7] = 180 + Angle(P2L)*rad2deg;
+  output[4] = P1L[0] - mp;         // T1
+  output[5] = Angle(P1L)*rad2deg ; // theat_1
+  output[6] = P2L[0] - mp;         // T2
+  output[7] = Angle(P2L)*rad2deg;  // theta_2
 
   output[8] = -beta;
 
-  /*// display 
+
+  /*
+  // display 
   printf("----------------- Lab frame\n");
   PrintV2D(PiL, " PiL");
   PrintV2D(PtL, " PtL");
@@ -191,6 +201,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   PrintV2D(P1L, " P1L");
   PrintV2D(P2L, " P2L");
   printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", output[4], output[5], output[6], output[7]);
+  printf("T1L+T2L: %10.4f \n", output[4]+output[6]);
   printf("----------------- Nuclues frame\n");
   PrintV2D(Pi, " Pi");
   PrintV2D(Pk, " Pk");
@@ -199,6 +210,7 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   PrintV2D(P1, " P1");
   PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[0], output[1], output[2], output[3]);
+  printf("Tc+td:%10.4f", output[0]+output[2]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", k, theta_k*rad2deg, theta_NN*rad2deg, Sp);
   printf("Etotal : %10.3f, 2*mp:%10.3f,  p1c:%10.3f, beta:%10.8f\n", Etotal,2*mp, p1c, beta);
   PrintV2D(Pic, " Pic");
@@ -206,7 +218,8 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
   PrintV2D(P1c, " P1c");
   PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
-  */
+*/  
+
   //delete pointer
   delete Pi;
   delete Pt;
@@ -233,13 +246,15 @@ float* Knockout2D(int MA, int Z, float TKEA, float k, float theta_k, float theta
 //################################################################################################
 
 float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T2, float theta_2){
+  // from T1, theta1, T2, theta2
+  // to get k, thetak, thetaNN, Sp, Tc theta_c, td, theta_d
     
   float mass = Nucleus_Mass(Z, MA);
 
   if ( mass == -404) return(0);
   
-  theta_1 = (180.-theta_1)/rad2deg;
-  theta_2 = (theta_2-180.)/rad2deg;
+  theta_1 = theta_1/rad2deg;
+  theta_2 = theta_2/rad2deg;
   
   // ########################### Lab Frame Inversed Kinematics
   float *PiL = new float[3];
@@ -263,7 +278,7 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   P2L[2] = sqrt(2*mp*T2 + T2*T2) * cos(theta_2);
 
 
-  //  ########################### Nucleus's frame
+  //________________________ Nucleus's frame
   float *Pi = new float[3];
   float *Pt = new float[3];
   float *P1 = new float[3];
@@ -279,15 +294,19 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   Pt[1] = 0;
   Pt[2] = 0;
 
-  PtL = Lorentz2D(Pt, -beta, 0);
-  P1  = Lorentz2D(P1L, beta, 0);
-  P2  = Lorentz2D(P2L, beta, 0);
+  PtL = Lorentz2D(Pt,  beta, 0);
+  P1  = Lorentz2D(P1L,-beta, 0);
+  P2  = Lorentz2D(P2L,-beta, 0);
+
+  P1[2] = -P1[2];
+  P2[2] = -P2[2];
 
   PrL[0] = PiL[0]+PtL[0]-P1L[0]-P2L[0];
   PrL[1] = PiL[1]+PtL[1]-P1L[1]-P2L[1];
   PrL[2] = PiL[2]+PtL[2]-P1L[2]-P2L[2];
 
-  Pr = Lorentz2D(PrL, beta, 0);
+  Pr = Lorentz2D(PrL,-beta, 0);
+  Pr[2] = -Pr[2];
     
   Pk[0] = Pt[0] - Pr[0];
   Pk[1] = Pt[1] - Pr[1];
@@ -299,7 +318,7 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   Pc[1] = (P1[1] + P2[1])/2;
   Pc[2] = (P1[2] + P2[2])/2;
 
-  // ########################### 2-body CM frame
+  //______________________________ 2-body CM frame
   float *Pic = new float[3];
   float *P1c = new float[3];
   float *P2c = new float[3];
@@ -313,11 +332,11 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   P1c = Lorentz2D(P1, -betaPc, thetaPc);
   P2c = Lorentz2D(P2, -betaPc, thetaPc);
     
-  //  ########################### Output
+  //_________________________________ Output
   float *output = new float[9];
     
   output[0] = Momentum2D(Pk); // k
-  output[1] = Angle(Pk)*rad2deg; // theta_k
+  output[1] = Angle(Pr)*rad2deg; // theta_k
   output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum2D(Pic)/Momentum2D(P1c))*rad2deg; // theta_NN
   output[3] = Mass2D(Pr) - mass + mp; // Sp
 
@@ -331,14 +350,15 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   float gamma = 1/sqrt(1-beta*beta);
   float SpOnline = mp*(1 - gamma) - gamma*(T1+T2) + gamma*beta*(abs(P1L[2]+P2L[2])); 
 
-  /*  // display 
+  /*
+  //__________________________________ display 
   printf("----------------- Lab frame\n");
   PrintV2D(PiL, " PiL");
   PrintV2D(PtL, " PtL");
   PrintV2D(PrL, " PrL");
   PrintV2D(P1L, " P1L");
   PrintV2D(P2L, " P2L");
-  printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, 180-theta_1*rad2deg, T2, theta_2*rad2deg+180);
+  printf("T1L:%10.4f, theta_1L:%10.4f, T2L:%10.4f, theta_2L:%10.4f \n", T1, theta_1*rad2deg, T2, theta_2*rad2deg);
   printf("----------------- Nuclues frame\n");
   PrintV2D(Pi, " Pi");
   PrintV2D(Pk, " Pk");
@@ -347,6 +367,7 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
   PrintV2D(P1, " P1");
   PrintV2D(P2, " P2");
   printf("Tc:%10.4f, theta_c:%10.4f, Td:%10.4f, theta_d:%10.4f \n", output[4], output[5], output[6], output[7]);
+  printf("Tc+Td:%10,4f", output[4]+output[6]);
   printf("k : %10.3f, theta_k:%10.3f, theta_NN:%10.3f, Sp:%10.5f\n", output[0],output[1], output[2], output[3]);
   printf(" beta:%10.8f, Sp_Online:%10.5f\n", beta, SpOnline);
   PrintV2D(Pic, " Pic");
@@ -383,6 +404,8 @@ float* Knockout2Dinv(int MA, int Z, float TKEA, float T1, float theta_1, float T
 //################################################################################################
 
 float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float theta_2, float Sp){
+  // T1, theta1, T2, theta2, Sp
+  // 
     
   printf("-------------------------------------\n");
   printf(" T1: %10.5f, theta_1: %10.5f, theta_2: %10.5f, SP:%10.5f\n", T1, theta_1, theta_2, Sp);
@@ -393,7 +416,7 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   theta_1 = (180.-theta_1)/rad2deg;
   theta_2 = (theta_2-180.)/rad2deg;
   
-  // ########################### Lab Frame Inversed Kinematics
+  //________________________________ Lab Frame Inversed Kinematics
   float *PiL = new float[3];
   float *P1L = new float[3];
   float *P2L = new float[3];
@@ -439,7 +462,7 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   P2L[1] = p2 * sin(theta_2);
   P2L[2] = p2 * cos(theta_2);
 
-  //  ########################### Nucleus's frame
+  //_____________________________ Nucleus's frame
   float *Pi = new float[3];
   float *Pt = new float[3];
   float *P1 = new float[3];
@@ -475,7 +498,7 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   Pc[1] = (P1[1] + P2[1])/2;
   Pc[2] = (P1[2] + P2[2])/2;
 
-  // ########################### 2-body CM frame
+  //____________________________ 2-body CM frame
   float *Pic = new float[3];
   float *P1c = new float[3];
   float *P2c = new float[3];
@@ -489,7 +512,7 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
   P1c = Lorentz2D(P1, -betaPc, thetaPc);
   P2c = Lorentz2D(P2, -betaPc, thetaPc);
     
-  //  ########################### Output
+  //_____________________________ Output
   float *output = new float[9];
     
   output[0] = Momentum2D(Pk); // k
@@ -506,7 +529,9 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
 
   float SpOnline = mp*(1 - gamma) - gamma*(T1+T2) + gamma*beta*(abs(P1L[2]+P2L[2])); 
 
-  /* // display 
+  /*
+   // display 
+  printf("========================= Inv=========\n");
   printf("----------------- Lab frame\n");
   PrintV2D(PiL, " PiL");
   PrintV2D(PtL, " PtL");
@@ -556,6 +581,8 @@ float* Knockout2Dinv2(int MA, int Z, float TKEA, float T1, float theta_1, float 
 //################################################################################################
 
 float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float theta_d, float Sp){
+  // 
+ 
     
   //printf("---------------- knockout inv 3---------------------\n");
   //printf(" Tc: %10.5f, theta_c: %10.5f, theta_d: %10.5f, SP:%10.5f\n", Tc, theta_c, theta_d, Sp);
@@ -639,6 +666,14 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   P1L = Lorentz2D(P1, -beta, 0);
   P2L = Lorentz2D(P2, -beta, 0);
 
+  //______ invert the z-axis
+  PiL[2] = - PiL[2];
+  PtL[2] = - PtL[2];
+  P1L[2] = - P1L[2];
+  P2L[2] = - P2L[2];
+  PrL[2] = - PrL[2];
+
+
   // ########################### 2-body CM frame
   float *Pic = new float[3];
   float *P1c = new float[3];
@@ -656,21 +691,22 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   //  ########################### Output
   float *output = new float[9];
     
-  output[0] = Momentum2D(Pk); // k
-  output[1] = Angle(Pk)*rad2deg; // theta_k
+  output[0] = Momentum2D(Pr); // k
+  output[1] = Angle(Pr)*rad2deg; // theta_k
   output[2] = acos((Pic[1]*P1c[1]+Pic[2]*P1c[2])/Momentum2D(Pic)/Momentum2D(P1c))*rad2deg; // theta_NN
   output[3] = T2; // Td
 
   output[4] = P1L[0] - mp;   // T1
-  output[5] = 180 - Angle(P1L)*rad2deg; // theta_1 
+  output[5] = Angle(P1L)*rad2deg; // theta_1 
   output[6] = P2L[0] - mp;   // T2
-  output[7] = 180 + Angle(P2L)*rad2deg;  // theta_2
+  output[7] = Angle(P2L)*rad2deg;  // theta_2
 
   output[8] = T2a;
 
   //float SpOnline = 0; 
 
-  /* // display 
+  /*
+  // display 
   printf("----------------- Lab frame\n");
   PrintV2D(PiL, " PiL");
   PrintV2D(PtL, " PtL");
@@ -693,7 +729,7 @@ float* Knockout2Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   PrintV2D(P1c, " P1c");
   PrintV2D(P2c, " P2c");
   printf("-----------------------------------\n");
-  */
+  */  
 
   //delete pointer
   delete Pi;
