@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
   if(argc < 7) {
-    printf("===============Generating Nucleus (p,pn) knockout data======================\n");
+    printf("===============Generating Nucleus (p,pn) knockout Kinetic data======================\n");
     printf("          Only for A(p,2p)O knockout [A(a,cd)b]\n");
     printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi\n");
     printf("      MA = Mass number of isotop \n");
@@ -55,9 +55,9 @@ int main(int argc, char *argv[]){
   float JA = 1.0;
   float JB = 1.5;
 
-  bool runTHREEDEE = 1;
+  bool runTHREEDEE = 0;
 
-  const int orbRange = 6;
+  const int orbRange = 1;
   const int TcStart = 30;
   const int TcEnd = 300;
   const int angcRange = 180;
@@ -86,15 +86,19 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
+  sprintf(filename, "../result/KECal_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
   
   //#############################  display input condition
   printf("===========================\n");
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
-  printf("Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
-  printf("angd step = %2d, phid Step = %2d, total loops = %10d \n", angStep, phiStep, totCount);
+  printf("#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcStart, TcEnd); 
+  printf("#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
+  printf("#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
+  printf("#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
+  printf("#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
+  printf("total loops = %10d \n",totCount);
   printf(" output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 
@@ -171,7 +175,7 @@ int main(int argc, char *argv[]){
             }
 
             // print condition
-            printf("\e[32m==== %6d(%6d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n",
+            printf("\e[32m==== %10d(%6d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n",
                    count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12]);
 
             printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n",
