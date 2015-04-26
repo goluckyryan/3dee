@@ -18,7 +18,7 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 7) {
+  if(argc < 8) {
     printf("===============Generating Nucleus (p,pn) knockout Kinetic data======================\n");
     printf("          Only for A(p,2p)O knockout [A(a,cd)b]\n");
     printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi\n");
@@ -28,6 +28,7 @@ int main(int argc, char *argv[]){
     printf("     dTc = step of KE of proton 1 \n");
     printf("    dAng = step of ang of protons \n");
     printf("    dPhi = step of phi of protons \n");
+    printf("    output: 0 = short, 1 = long \n");
     exit(0);
   }
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]){
   int   TcStep = atoi(argv[4]);
   int  angStep = atoi(argv[5]);
   int  phiStep = atoi(argv[6]);
+  int  option  = atoi(argv[7]);
   
   int N = 0;
   int L = 0;
@@ -58,12 +60,12 @@ int main(int argc, char *argv[]){
   bool runTHREEDEE = 0;
 
   const int orbRange = 1;
-  const int TcStart = 30;
-  const int TcEnd = 300;
-  const int angcRange = 180;
-  const int angdRange = 180;
-  const int phicRange = 22; //+-
-  const int phidRange = 22; //+-
+  const float TcStart = 30;
+  const float TcEnd = 300;
+  const float angcRange = 180;
+  const float angdRange = 180;
+  const float phicRange = 22; //+-
+  const float phidRange = 22; //+-
 
   int totCount = 0;
 
@@ -83,8 +85,6 @@ int main(int argc, char *argv[]){
     }
   }
 
-  float *output = new float[13]; // knockout output 
-
   char filename[50];
   sprintf(filename, "../result/KECal_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
   
@@ -93,9 +93,9 @@ int main(int argc, char *argv[]){
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
-  printf("#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcStart, TcEnd); 
-  printf("#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
-  printf("#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
+  printf("#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
+  printf("#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0., angcRange); 
+  printf("#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0., angdRange);
   printf("#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
   printf("#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
   printf("total loops = %10d \n",totCount);
@@ -106,28 +106,32 @@ int main(int argc, char *argv[]){
   FILE * paraOut;
   paraOut = fopen (filename, "w");
   // file header
-  fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
-  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
-  fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcStart, TcEnd); 
-  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
-  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
-  fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
-  fprintf(paraOut, "#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
-  int paraNum = 18;
-  fprintf(paraOut, "#%*s", 12*paraNum," cross section unit = ub"); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
-  fprintf(paraOut, "#"); for (int i = 1; i <= paraNum+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
-  fprintf(paraOut, "#%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
+  if( option == 1){
+    fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
+    fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
+    fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
+    fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0., angcRange); 
+    fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0., angdRange);
+    fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
+    fprintf(paraOut, "#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
+    int paraNum = 18;
+    fprintf(paraOut, "#%*s", 12*paraNum," cross section unit = ub"); for (int ID = 1; ID<=orbRange ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
+    fprintf(paraOut, "#"); for (int i = 1; i <= paraNum+2*orbRange ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
+    fprintf(paraOut, "#%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s", 
           "Tc", "theta_c", "phi_c","Td", "theta_d", "phi_d", "beta_d", "k", "theta_k", "phi_k", "theta_NN", "phi_NN", "T_1","theta_1", "phi_1", "T_2", "theta_2", "phi_2");
-  for (int ID= 1; ID <=orbRange ; ID++){
-    orbit(ID, N, L, J);
-    char NLJ[9];
-    sprintf(NLJ, "%1d%1s%1d/2", N, symbolL(L), (int)(2*J));
-    for (int i = 1; i <= 2; i++){
-      fprintf(paraOut,"%12s", NLJ);  
+    for (int ID= 1; ID <=orbRange ; ID++){
+      orbit(ID, N, L, J);
+      char NLJ[9];
+      sprintf(NLJ, "%1d%1s%1d/2", N, symbolL(L), (int)(2*J));
+      for (int i = 1; i <= 2; i++){
+        fprintf(paraOut,"%12s", NLJ);  
+      }
     }
+    fprintf(paraOut, "\n");
   }
-  fprintf(paraOut, "\n");
-    
+
+  char TcStr[10], angcStr[10], angdStr[10], betadStr[10];
+              
 
   //########################### start looping
   int count = 0;
@@ -151,6 +155,7 @@ int main(int argc, char *argv[]){
             }
 
             // use knockout2D.h to calculate Tc thetac and thetad;
+            float *output;// = new float[13]; // knockout output 
             output = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp);
 
             float betad = 0;
@@ -178,13 +183,22 @@ int main(int argc, char *argv[]){
             printf("\e[32m==== %10d(%6d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n",
                    count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12]);
 
-            printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n",
-                   output[0], output[1], output[2], output[3], output[4], output[5]);
+            //printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n",
+            //       output[0], output[1], output[2], output[3], output[4], output[5]);
          
             // save parameters + readout
-            fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
-                    Tc, angc, phic, output[7], angd, phid2,  betad, output[8], output[9], output[10], output[11], output[12],output[0], output[1], output[2], output[3], output[4], output[5]);       
 
+            if( option == 1){
+              fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f",
+                    Tc, angc, phic, output[7], angd, phid2,  betad, output[8], output[9], output[10], output[11], output[12],output[0], output[1], output[2], output[3], output[4], output[5]);       
+            }else{
+              sprintf(TcStr , "%.2f",Tc);
+              sprintf(angcStr , "%.2f", angc );
+              sprintf(angdStr , "%.2f", angd );
+              sprintf(betadStr, "%.2f", betad);
+              fprintf(paraOut,"%-10s%-10s%-10s%-10s",
+                      TcStr, angcStr, angdStr, betadStr);
+            }
             for (int ID=1; ID <=orbRange; ID ++){
               count ++;
               effCount ++;
@@ -221,13 +235,13 @@ int main(int argc, char *argv[]){
     }
     //fprintf(paraOut,"\n");
   }
-  fprintf(paraOut,"##################################\n");
+  //fprintf(paraOut,"##################################\n");
 
   fclose(paraOut);
   // append infile to  output file
-  char command[100];
-  sprintf(command,"cat %s >> %s","infile", filename);
-  system(command);
+  //char command[100];
+  //sprintf(command,"cat %s >> %s","infile", filename);
+  //system(command);
 
   //########################## display result
   time_t Tend=time(0);
