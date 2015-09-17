@@ -33,10 +33,32 @@ using namespace std; // declare a namespace "std", every variable in this code i
 
 // 4 vector = (E, px, py, pz)
 
+  float *Pi = new float[4];
+  float *Pt = new float[4];
+  float *P1 = new float[4];
+  float *P2 = new float[4];
+  float *Pr = new float[4];
+  float *Pk = new float[4];
+
+  float *Pc = new float[4];
+
+  float *Pic = new float[4];
+  float *P1c = new float[4];
+  float *P2c = new float[4];
+  float *Pkc = new float[4];
+  float *Pcc = new float[4];
+
+  float *PiL = new float[4];
+  float *P1L = new float[4];
+  float *P2L = new float[4];
+  float *PtL = new float[4];
+  float *PrL = new float[4];
+
+  float * Prot = new float[4];
+
 //function___________________________________________________________________
-float* Lorentz(float *V, float beta, float theta, float phi){
-  float *U = new float[4];
-    
+int Lorentz(float *V, float beta, float theta, float phi, float *U){
+
   float gamma = 1/sqrt(1-beta*beta);
   float alpha = beta*gamma;
   float cTh   = cos(theta); float ccTh = cTh*cTh;
@@ -63,7 +85,7 @@ float* Lorentz(float *V, float beta, float theta, float phi){
   U[2] = V[0]*L13 + V[1]*L23 + V[2]*L33 + V[3]*L34;
   U[3] = V[0]*L14 + V[1]*L24 + V[2]*L34 + V[3]*L44;
     
-  return U;
+  return 1;
 }
 
 void PrintV(float *V, string Vname){
@@ -88,13 +110,14 @@ float DAng(float *V, float *U){
   return acos(dotproduct);
 }
 
+/*
 float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k, float theta_NN, float phi_NN, float Sp){
   /*  
   printf("-----KNOCKOUT 3D-----------\n");
   printf("     k: %10.6f,     Sp: %10.6f \n", k, Sp);
   printf(" ang_k: %10.6f, ang_NN: %10.6f \n", theta_k, theta_NN);
   printf(" phi_k: %10.6f, phi_NN: %10.6f \n", phi_k, phi_NN);
-  */
+  
   float mass = Nucleus_Mass(Z, MA);
 
   if ( mass == -404) return(0);
@@ -211,7 +234,7 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   output[11] = Theta(P2L)*rad2deg;
   output[12] = Phi(P2L)*rad2deg;
 
-  /*// display 
+  // display 
   printf("----------------- Lab frame\n");
   PrintV(PiL, " PiL");
   PrintV(PtL, " PtL");
@@ -239,7 +262,7 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   PrintV(P2c, " P2c");
   printf("Dang(Pic, P1c) = %6.2f deg \n", DAng(Pic,P1c)*rad2deg );
   printf("=======================================\n");
-  */
+  
   //delete pointer
   delete Pi;
   delete Pt;
@@ -262,18 +285,29 @@ float* Knockout3D(int MA, int Z, float TKEA, float k, float theta_k, float phi_k
   delete PkL;
     
   return output;
-}
+}*/
 
 //#################################################################################
 
-float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float phi_c, float theta_d, float phi_d, float Sp){
+int Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float phi_c, float theta_d, float phi_d, float Sp, float *output){
   /*
   printf("------KNOCKOUT3D inv3---------\n");
   printf("   T_c: %10.6f,     Sp: %10.6f \n", Tc, Sp);
   printf(" ang_c: %10.6f,  ang_d: %10.6f \n", theta_c, theta_d);
   printf(" phi_c: %10.6f,  phi_d: %10.6f \n", phi_c, phi_d);
   */
-  float mass = Nucleus_Mass(Z, MA);
+  //float mass = Nucleus_Mass(Z, MA);
+
+  float mass;
+  switch (MA) {
+  case 14: mass = 13044.836422; break;
+  case 16: mass = 14895.080096; break;
+  case 22: mass = 20498.064784; break;
+  case 23: mass = 21423.077578; break;
+  case 25: mass = 23294.116162; break;
+  case 24: mass = 22370.269976; break; 
+  default: mass = -404; break;
+  }
 
   if ( mass == -404) return(0);
   
@@ -283,12 +317,7 @@ float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   phi_d = phi_d/rad2deg;
  
   //  ########################### Nuclei's frame
-  float *Pi = new float[4];
-  float *Pt = new float[4];
-  float *P1 = new float[4];
-  float *P2 = new float[4];
-  float *Pr = new float[4];
-  float *Pk = new float[4];
+
     
   Pi[0] = mp+TKEA;
   Pi[1] = 0;
@@ -317,16 +346,20 @@ float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   float B = 2*(a*a+mp*mp-b)*d;
   float C = 4*a*a*mp*mp-(a*a+mp*mp-b)*(a*a+mp*mp-b);
 
-  float p2a = (-B-sqrt(B*B-4*A*C))/2/A;
-  float p2b = (-B+sqrt(B*B-4*A*C))/2/A;
+  float Delta = B*B - 4*A*C;
+
+  if( Delta < 0 ){
+    printf(" Delta < 0, Tc:%10.4f, theta_c:%10.4f, theta_d:%10.4f, phi_c:%10.4f, phi_d:%10.4f \n", Tc, theta_c*rad2deg, theta_d*rad2deg, phi_c*rad2deg, phi_d*rad2deg);
+    return 0;
+  }
+
+  float p2a = (-B-sqrt(Delta))/2/A;
+  float p2b = (-B+sqrt(Delta))/2/A;
 
   float p2 = p2b;
 
-  float Tda = 0;
-  if ( p2a >= 0 ) {
-    printf(" p2- = %10.4f\n", p2a);
-    Tda = sqrt(mp*mp + p2a*p2a)-mp;
-  }
+  float Tda = sqrt(mp*mp + p2a*p2a)-mp;
+  if( p2a > 0) printf(" | p2min = %f, Tdmin = %f \n", p2a, Tda); 
   float Td = sqrt(mp*mp + p2*p2)-mp;
   
   P2[0] = mp+Td;
@@ -336,64 +369,50 @@ float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
 
   Pr[0] = Pi[0] + Pt[0] - P1[0] - P2[0];
   Pr[1] = Pi[1] + Pt[1] - P1[1] - P2[1];
-  Pr[2] = Pi[2] + Pt[2] - P1[2] - P2[2];
-  Pr[3] = Pi[3] + Pt[3] - P1[3] - P2[3];
+  Pr[2] = Pi[2] + Pt[2] - P1[2] - P2[2];  Pr[3] = Pi[3] + Pt[3] - P1[3] - P2[3];
     
   Pk[0] = Pt[0] - Pr[0];
   Pk[1] = Pt[1] - Pr[1];
   Pk[2] = Pt[2] - Pr[2];
   Pk[3] = Pt[3] - Pr[3];
 
-  float *Pc = new float[4];
   Pc[0] = (Pi[0] + Pk[0])/2;
   Pc[1] = (Pi[1] + Pk[1])/2;
   Pc[2] = (Pi[2] + Pk[2])/2;
   Pc[3] = (Pi[3] + Pk[3])/2;
 
   // ########################### 2-body CM frame
-  float *Pic = new float[4];
-  float *P1c = new float[4];
-  float *P2c = new float[4];
-  float *Pkc = new float[4];
-  float *Pcc = new float[4];
+
 
   float betaPc = Momentum(Pc)/Pc[0];
   float thetaPc = Theta(Pc);
   float phiPc = Phi(Pc);
   
-  Pcc = Lorentz(Pc, -betaPc, thetaPc, phiPc);
-  Pic = Lorentz(Pi, -betaPc, thetaPc, phiPc);
-  Pkc = Lorentz(Pk, -betaPc, thetaPc, phiPc);
-  P1c = Lorentz(P1, -betaPc, thetaPc, phiPc);
-  P2c = Lorentz(P2, -betaPc, thetaPc, phiPc);
+  Lorentz(Pc, -betaPc, thetaPc, phiPc, Pcc);
+  Lorentz(Pi, -betaPc, thetaPc, phiPc, Pic);
+  Lorentz(Pk, -betaPc, thetaPc, phiPc, Pkc);
+  Lorentz(P1, -betaPc, thetaPc, phiPc, P1c);
+  Lorentz(P2, -betaPc, thetaPc, phiPc, P2c);
     
   // ########################### Lab Frame Inversed Kinematics
-  float *PiL = new float[4];
-  float *P1L = new float[4];
-  float *P2L = new float[4];
-  float *PtL = new float[4];
-  float *PrL = new float[4];
-    
   float beta = Momentum(Pi)/Pi[0];
     
-  PiL = Lorentz(Pi, -beta, 0, 0);
-  PtL = Lorentz(Pt, -beta, 0, 0);
-  P1L = Lorentz(P1, -beta, 0, 0);
-  P2L = Lorentz(P2, -beta, 0, 0);
-  PrL = Lorentz(Pr, -beta, 0, 0);
+  Lorentz(Pi, -beta, 0, 0, PiL);
+  Lorentz(Pt, -beta, 0, 0, PtL);
+  Lorentz(P1, -beta, 0, 0, P1L);
+  Lorentz(P2, -beta, 0, 0, P2L);
+  Lorentz(Pr, -beta, 0, 0, PrL);
 
   //Find theta_NNm phi_NN
   float theta_ic = Theta(Pic);
   float phi_ic = Phi(Pic);
 
-  float * Prot = new float[4];
   Prot[0] = 0;
   Prot[1] =  (P1c[1]*cos(-phi_ic) - P1c[2]*sin(-phi_ic))*cos(-theta_ic)+P1c[3]*sin(-theta_ic);
   Prot[2] =   P1c[1]*sin(-phi_ic) + P1c[2]*cos(-phi_ic);
   Prot[3] = -(P1c[1]*cos(-phi_ic) - P1c[2]*sin(-phi_ic))*sin(-theta_ic)+P1c[3]*cos(-theta_ic);
   
   //===================================  
-  float *output = new float[13];
     
   output[0] = P1L[0] - mp; // T_1
   output[1] = 180 - Theta(P1L)*rad2deg; // theta_1
@@ -439,28 +458,32 @@ float* Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float 
   printf("=====================================\n");
   */
   //delete pointer
-  delete Pi;
-  delete Pt;
-  delete P1;
-  delete P2;
-  delete Pr;
-  delete Pk;
-  delete Pc;
-    
-  delete Pic;
-  delete Pkc;
-  delete P1c;
-  delete P2c;
 
-  delete PiL;
-  delete PtL;
-  delete P1L;
-  delete P2L;
-  delete PrL;
+  /*
+  delete [] Pi;
+  delete [] Pt;
+  delete [] P1;
+  delete [] P2;
+  delete [] Pr;
+  delete [] Pk;
+  delete [] Pc;
+         
+  delete [] Pic;
+  delete [] Pkc;
+  delete [] P1c;
+  delete [] P2c;
+         
+  delete [] PiL;
+  delete [] PtL;
+  delete [] P1L;
+  delete [] P2L;
+  delete [] PrL;
+         
+  delete [] Prot;
 
-  delete Prot;
+  */
     
-  return output;
+  return 1;
 }
 
 

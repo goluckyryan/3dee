@@ -18,16 +18,18 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 7) {
+  if(argc < 9) {
     printf("===============Generating Nucleus (p,pn) knockout data======================\n");
     printf("          Only for A(p,2p)O knockout [A(a,cd)b]\n");
-    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi\n");
-    printf("      MA = Mass number of isotop \n");
-    printf("      Z  = charge number of isotop \n");
-    printf("      BE = seperation energy \n");
-    printf("     dTc = step of KE of proton 1 \n");
-    printf("    dAng = step of ang of protons \n");
-    printf("    dPhi = step of phi of protons \n");
+    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi option comment\n");
+    printf("      MA : Mass number of isotop \n");
+    printf("      Z  : charge number of isotop \n");
+    printf("      BE : seperation energy \n");
+    printf("     dTc : step of KE of proton 1 \n");
+    printf("    dAng : step of ang of protons \n");
+    printf("    dPhi : step of phi of protons \n");
+    printf("  option : 0 = full solid angle, 1 = SHARAQ04 acceptance \n"); 
+    printf(" comment : comment \n");
     exit(0);
   }
 
@@ -37,6 +39,7 @@ int main(int argc, char *argv[]){
   switch (MA) {
   case 14: Ti = 245.46; break;
   case 16: Ti = 200.0; break;
+  case 22: Ti = 256.0; break;
   case 23: Ti = 289.44; break;
   case 25: Ti = 276.779; break;  
   default: Ti = 200.0; break;
@@ -47,6 +50,7 @@ int main(int argc, char *argv[]){
   int   TcStep = atoi(argv[4]);
   int  angStep = atoi(argv[5]);
   int  phiStep = atoi(argv[6]);
+  int  option  = atoi(argv[7]);
   
   int N = 0;
   int L = 0;
@@ -58,18 +62,27 @@ int main(int argc, char *argv[]){
   bool runTHREEDEE = 1;
 
   const int orbRange = 6;
-  const int TcStart = 30;
-  const int TcEnd = 300;
-  const int angcRange = 180;
-  const int angdRange = 180;
-  const int phicRange = 22; //+-
-  const int phidRange = 22; //+-
+  float TcStart = 30;
+  float TcEnd = 270;
+  float angcRange = 180;
+  float angdRange = 180;
+  float phicRange = 16; //+-
+  float phidRange = 16; //+-
+
+  if ( option == 0 ){
+    phicRange = 90;
+    phidRange = 90;
+  }
 
   int totCount = 0;
 
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
     for (float angc = 0; angc<=angcRange; angc+=angStep){
       for(float angd = 0; angd<=angdRange; angd+=angStep){
+        //if( angc == 0 || angd == 0) {
+        //  totCount += orbRange;
+        //  continue;
+        //}
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
             totCount += orbRange;
@@ -86,25 +99,26 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
+  sprintf(filename, "../result/xsec_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%1d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep, option, argv[8]);
   
   //#############################  display input condition
   printf("===========================\n");
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
-  printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
-  printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
-  printf("Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
-  printf("angd step = %2d, phid Step = %2d, total loops = %10d \n", angStep, phiStep, totCount);
+  printf(" Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
+  printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
+  printf(" Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
+  printf(" angd step = %2d, phid Step = %2d, total loops = %10d \n", angStep, phiStep, totCount);
+  printf(" option = %1d \n", option);
   printf(" output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 
   //####################### rewrite output file
   FILE * paraOut;
-  paraOut = fopen (filename, "w");
+  paraOut = fopen (filename, "w+");
   // file header
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
-  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
-  fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcStart, TcEnd); 
+  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f, option=%1d\n", Sp, Ti, option);
+  fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
   fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
   fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
   fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
@@ -123,7 +137,8 @@ int main(int argc, char *argv[]){
     }
   }
   fprintf(paraOut, "\n");
-    
+  fflush(paraOut);
+  //fclose(paraOut);
 
   //########################### start looping
   int count = 0;
@@ -147,7 +162,7 @@ int main(int argc, char *argv[]){
             }
 
             // use knockout2D.h to calculate Tc thetac and thetad;
-            output = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp);
+            int kineticCal  = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp, output);
 
             float betad = 0;
             if(phid2 >= 0){
@@ -157,14 +172,16 @@ int main(int argc, char *argv[]){
             }
             
             // Td is nan
-            if ( isnan(output[7])) {
+            
+            if ( kineticCal == 0 ||  isnan(output[7])) {
               //printf(" --------- skipped due to impossible kinematic. \n");
               count += orbRange;
               continue;
             }
 
             // Accpetance Filter
-            if (  bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5])) {
+            bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5]);
+            if (  option && jjj) {
               //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]);
               count+= orbRange;
               continue;
@@ -188,7 +205,6 @@ int main(int argc, char *argv[]){
               if ( runTHREEDEE){              
                 //orbit
                 orbit(ID, N, L, J);
-
                 // make infile
                 make_infile(MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad);
 
@@ -196,14 +212,18 @@ int main(int argc, char *argv[]){
                 system("./threedee infile");
      
                 // read_outfile : xsec + Ay
-                if (read_outfile(57) == 10) continue;
+                // 57 for Dirac
+		// 81 for Ogata
+                if (read_outfile(81) == 10) {
+			printf("Please adjust the read Line.\n");		
+			continue;
+		}
           
                 // save parameters + readout
                 fprintf(paraOut,"%12.6f%12.6f",DWIA*1000.,A00n0); 
-
-                if ( DWIA > 1) printf("\e[31m");
+                //printf("\e[31m");
                 printf("                                                                DWIA(%1d%1s%1d/2):%14.10f ub\n", N, symbolL(L), (int)(2*J), DWIA*1000.);
-                if ( DWIA > 1) printf("\e[m");
+                //printf("\e[m");
                 //Delete outfile
                 //        remove("outfile");
               }
@@ -211,6 +231,7 @@ int main(int argc, char *argv[]){
             }
             fprintf(paraOut, "\n");
           }
+          fflush(paraOut);
         }
       }
       //fprintf(paraOut,"\n");
@@ -218,8 +239,8 @@ int main(int argc, char *argv[]){
     //fprintf(paraOut,"\n");
   }
   fprintf(paraOut,"##################################\n");
-
   fclose(paraOut);
+
   // append infile to  output file
   char command[100];
   sprintf(command,"cat %s >> %s","infile", filename);

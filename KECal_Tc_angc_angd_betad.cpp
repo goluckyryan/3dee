@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
   case 14: Ti = 245.46; break;
   case 16: Ti = 200.0; break;
   case 23: Ti = 289.44; break;
+  case 22: Ti = 254.06; break;
   case 25: Ti = 276.779; break;  
   default: Ti = 200.0; break;
   }
@@ -59,22 +60,22 @@ int main(int argc, char *argv[]){
 
   bool runTHREEDEE = 0;
 
-  const int orbRange = 1;
+  const int orbRange = 0;
   const float TcStart = 30;
-  const float TcEnd = 300;
-  const float angcRange = 180;
-  const float angdRange = 180;
-  const float phicRange = 22; //+-
-  const float phidRange = 22; //+-
+  const float TcEnd = 270;
+  const float angcRange = 170;
+  const float angdRange = 170;
+  const float phicRange = 16; //+-
+  const float phidRange = 16; //+-
 
   int totCount = 0;
 
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
-    for (float angc = 0; angc<=angcRange; angc+=angStep){
-      for(float angd = 0; angd<=angdRange; angd+=angStep){
+    for (float angc = 10; angc<=angcRange; angc+=angStep){
+      for(float angd = 10; angd<=angdRange; angd+=angStep){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
-            totCount += orbRange;
+            totCount += max(orbRange,1);
 
             //printf("Tc:%5.1f, theta_c:%5.1f, phi_c:%5.1f, theta_d:%5.1f, phi_d:%5.1f |", Tc, angc, phic, angd, phid);
 
@@ -86,16 +87,19 @@ int main(int argc, char *argv[]){
   }
 
   char filename[50];
-  sprintf(filename, "../result/KECal_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
-  
+  if ( option ==1){
+    sprintf(filename, "../result/KECal_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_long.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
+  }else{
+    sprintf(filename, "../result/KECal_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_short.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep);
+  }
   //#############################  display input condition
   printf("===========================\n");
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf("#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
-  printf("#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0., angcRange); 
-  printf("#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0., angdRange);
+  printf("#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 10., angcRange); 
+  printf("#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 10., angdRange);
   printf("#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
   printf("#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
   printf("total loops = %10d \n",totCount);
@@ -110,8 +114,8 @@ int main(int argc, char *argv[]){
     fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
     fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
     fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
-    fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0., angcRange); 
-    fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0., angdRange);
+    fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 10., angcRange); 
+    fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 10., angdRange);
     fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
     fprintf(paraOut, "#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
     int paraNum = 18;
@@ -131,18 +135,18 @@ int main(int argc, char *argv[]){
   }
 
   char TcStr[10], angcStr[10], angdStr[10], betadStr[10];
-              
+  float * output = new float[13];
 
   //########################### start looping
   int count = 0;
   int effCount = 0;
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
-    for (float angc = 0; angc<=angcRange; angc+=angStep){
-      for(float angd = 0; angd<=angdRange; angd+=angStep){
+    for (float angc = 10; angc<=angcRange; angc+=angStep){
+      for(float angd = 10; angd<=angdRange; angd+=angStep){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
 
-            if( count % 600000 == 0 ) printf("count : %15d | Tc:%7.2f, angc:%7.2f, angd:%7.2f, phic:%7.2f, phid:%7.2f \n", count, Tc, angc, angd, phic, phid);
+            if( count % 600000 == 0 ) printf("count : %15d (%4.2f%%) | Tc:%7.2f, angc:%7.2f, angd:%7.2f, phic:%7.2f, phid:%7.2f \n", count, count*100./totCount, Tc, angc, angd, phic, phid);
 
             //refine phid
             float phid2 = 0;
@@ -151,12 +155,12 @@ int main(int argc, char *argv[]){
             }else if(phid < -180){
               phid2 = 360+phid;
             }else{
-              phid2 = phid;
+              phid2 = phid; 
             }
 
             // use knockout2D.h to calculate Tc thetac and thetad;
-            float *output;// = new float[13]; // knockout output 
-            output = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp);
+            //float *output = new float[13]; // knockout output 
+            Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp, output); 
 
             float betad = 0;
             if(phid2 >= 0){
@@ -166,21 +170,24 @@ int main(int argc, char *argv[]){
             }
             
             // Td is nan
+            
             if ( isnan(output[7])) {
               //printf(" --------- skipped due to impossible kinematic. \n");
-              count += orbRange;
+              count += max(orbRange,1);
+              //delete[] output;
               continue;
             }
 
             // Accpetance Filter
             if (  bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5])) {
               //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]);
-              count+= orbRange;
+              count+= max(orbRange,1);
+              //delete[] output;
               continue;
-            }
+              }
 
             // print condition
-            printf("\e[32m==== %10d(%6d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n",
+            printf("\e[32m==== %10d(%6d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%8.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n",
                    count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12]);
 
             //printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n",
@@ -196,9 +203,17 @@ int main(int argc, char *argv[]){
               sprintf(angcStr , "%.2f", angc );
               sprintf(angdStr , "%.2f", angd );
               sprintf(betadStr, "%.2f", betad);
-              fprintf(paraOut,"%-10s%-10s%-10s%-10s",
+              fprintf(paraOut,"%-10s%-10s%-10s%-10s%",
                       TcStr, angcStr, angdStr, betadStr);
             }
+
+            if( orbRange ==0) {
+
+            count  ++;
+            effCount ++;
+          }
+
+
             for (int ID=1; ID <=orbRange; ID ++){
               count ++;
               effCount ++;
@@ -225,11 +240,13 @@ int main(int argc, char *argv[]){
                 //Delete outfile
                 //        remove("outfile");
               }
+
+              //delete[] output;
        
             }
             fprintf(paraOut, "\n");
           }
-        }
+        } 
       }
       //fprintf(paraOut,"\n");
     }

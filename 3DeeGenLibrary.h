@@ -15,8 +15,8 @@ double Ay;
 double A00n0, Pn000, P0n00;
 
 //***********************************************************************************
-char* symbolL(int L);
-char* symbolZ(int Z);
+const char* symbolL(int L);
+const char* symbolZ(int Z);
 void orbit(int ID, int &N, int &L, float &J);
 int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
 int read_outfile(int linePWIA);
@@ -26,7 +26,7 @@ float mwdcY(float x);
 float* RotY( float * V, float ang );
 
 //***********************************************************************************
-char* symbolL(int L){
+const char* symbolL(int L){
   switch (L){
   case 0: return "s";break;
   case 1: return "p";break;
@@ -38,7 +38,7 @@ char* symbolL(int L){
   }
 }
 
-char* symbolZ(int Z){
+const char* symbolZ(int Z){
   switch (Z){
   case 1: return "H";break;
   case 2: return "He";break;
@@ -173,8 +173,8 @@ int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float
 }
 
 int read_outfile(int linePWIA){
-
-  string line[84];
+  const int nline = 100;
+  string line[nline];
   ifstream file_in;
   file_in.open("outfile");
 
@@ -183,12 +183,17 @@ int read_outfile(int linePWIA){
     exit(1);
   }
   
-  for(int i=1; i<84; i++){
+  for(int i=1; i<nline; i++){
     getline(file_in,line[i]);
+    if( file_in.eof() ) break;
   }
   
   file_in.close();
-  
+
+//  for( int i = 0; i< 10; i++){
+//    printf("%s\n", line[linePWIA+i].c_str());
+//  }
+
   int lineAdj = 0;
   if ( line[linePWIA].length() == 0){
     lineAdj = 1;
@@ -197,6 +202,8 @@ int read_outfile(int linePWIA){
   }
 
   linePWIA += lineAdj;
+
+//  printf("----------1\n");
 
   if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0) return 10;
 
@@ -214,7 +221,7 @@ int read_outfile(int linePWIA){
 
   Ay = Pn000;
    
-  //printf("PWIA = %f, DWIA = %f, Ay = %f\n", PWIA, DWIA, Ay);
+  printf("PWIA = %f, DWIA = %f, Ay = %f\n", PWIA, DWIA, Ay);
 
   return 0;
 }
