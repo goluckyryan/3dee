@@ -75,11 +75,11 @@ int main(int argc, char *argv[]){
   float *output = new float[9]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep,argv[6]);
+  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d_%s.dat",  MA, symbolZ(Z, MA), Sp,TcStep, angStep,argv[6]);
   
 //#############################  display input condition
   printf("===========================\n");
-  printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
+  printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z, MA), MA-1, symbolZ(Z-1, MA-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf("Tc step = %2d MeV, angc step = %2d,  angd step = %2d, total loops = %10d \n", TcStep, angStep, angStep, totCount);
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]){
   time_t Tend=time(0);
   printf("\e[32m[%5.1f%%]========== Totol run time %10.0f sec = %5.1f min = %5.1f hr| speed:#%5.2f(%5.2f)/sec ===========\e[m\n",
          count*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
-  printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
+  printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z, MA) ,MA-1,symbolZ(Z-1, MA-1),  Ti );
   printf("  JA = %3.1f, JB = %3.1f\n, Sp", JA, JB, Sp);
   printf("  Tc step = %2d MeV, ang step = %2d, total loops = %10d \n", TcStep, angStep, totCount);
   printf("  output: %s \n", filename);  

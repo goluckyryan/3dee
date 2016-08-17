@@ -44,6 +44,8 @@ int main(int argc, char *argv[]){
   case 25: Ti = 276.779; break;  
   default: Ti = 200.0; break;
   }
+  
+  
 
   int Z = atoi(argv[2]);
   float Sp = atof(argv[3]);
@@ -62,17 +64,19 @@ int main(int argc, char *argv[]){
 
   const int orbRange = 6;
   float TcStart = 30;
-  float TcEnd = 350;
-  float angcRange = 180;
-  float angdRange = 180;
+  float TcEnd = Ti-Sp;
+  float angcStart = 0;
+  float angcEnd = 180;
+  float angdStart = 0;
+  float angdEnd = 180;
   float phicRange = 16; //+-
   float phidRange = 16; //+-
 
   int totCount = 0;
 
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
-    for (float angc = 0; angc<=angcRange; angc+=angStep){
-      for(float angd = 0; angd<=angdRange; angd+=angStep){
+    for (float angc = angcStart; angc<=angcEnd; angc+=angStep){
+        for(float angd = angdStart; angd<=angdEnd; angd+=angStep){
         //if( angc == 0 || angd == 0) {
         //  totCount += orbRange;
         //  continue;
@@ -93,11 +97,11 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/3d_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep, argv[7]);
+  sprintf(filename, "../result/3d_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Sp,TcStep, angStep, phiStep, argv[7]);
   
   //#############################  display input condition
   printf("===========================\n");
-  printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z), MA-1, symbolZ(Z-1));
+  printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z, MA), MA-1, symbolZ(Z-1, MA));
   printf(" Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf(" Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
@@ -112,8 +116,8 @@ int main(int argc, char *argv[]){
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
   fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
-  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
-  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
+  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, angcStart, angcEnd); 
+  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, angdStart, angdEnd);
   fprintf(paraOut, "#B%15s%2d deg, Range (%6.1f, %6.1f)\n", "phic step =", phiStep, -phicRange, phicRange);
   fprintf(paraOut, "#A%15s%2d deg, Range (%6.1f, %6.1f)\n", "phid step =", phiStep, -phidRange, phidRange);
   int paraNum = 18;
@@ -137,8 +141,8 @@ int main(int argc, char *argv[]){
   int count = 0;
   int effCount = 0;
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
-    for (float angc = 0; angc<=angcRange; angc+=angStep){
-      for(float angd = 0; angd<=angdRange; angd+=angStep){
+    for (float angc = angcStart; angc<=angcEnd; angc+=angStep){
+      for(float angd = angdStart; angd<=angdEnd; angd+=angStep){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
 
@@ -245,7 +249,7 @@ int main(int argc, char *argv[]){
   time_t Tend=time(0);
   printf("\e[32m[%5.1f%%](%5.1f%%)========== Totol run time %10.0f sec = %5.1f min = %5.1f hr| speed:#%5.2f(%5.2f)/sec ===========\e[m\n",
          count*100./totCount,effCount*100./totCount,difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart)); 
-  printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z) ,MA-1,symbolZ(Z-1),  Ti );
+  printf("  condition %2d%s(p,2p)%2d%s   Ti:%7.2f MeV \n", MA, symbolZ(Z, MA) ,MA-1,symbolZ(Z-1, MA-1),  Ti );
   printf("  JA = %3.1f, JB = %3.1f,  Sp =%7.2f", JA, JB, Sp);
   printf("Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
   printf("angd step = %2d, phid Step = %2d, total loops = %10d, effLoop = %10d \n", angStep, phiStep, totCount, effCount);

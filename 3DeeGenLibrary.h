@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 #include <cstring>
+#include "nuclei_mass.h"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ double A00n0, Pn000, P0n00;
 
 //***********************************************************************************
 const char* symbolL(int L);
-const char* symbolZ(int Z);
+const char* symbolZ(int Z, int A);
 void orbit(int ID, int &N, int &L, float &J);
 int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
 int read_outfile(int linePWIA);
@@ -38,7 +39,8 @@ const char* symbolL(int L){
   }
 }
 
-const char* symbolZ(int Z){
+const char* symbolZ(int Z, int A){
+/*
   switch (Z){
   case 1: return "H";break;
   case 2: return "He";break;
@@ -50,18 +52,45 @@ const char* symbolZ(int Z){
   case 8: return "O";break;
   case 9: return "F";break;
   }
+*/
+
+  string sym = Nucleus_Name(Z,A);
+  return sym.c_str();
+  
 }
 
 void orbit(int ID, int &N, int &L, float &J){
   switch(ID){
-  case 1: N = 1; L = 0; J = 0.5; break;
-  case 2: N = 1; L = 1; J = 1.5; break;
-  case 3: N = 1; L = 1; J = 0.5; break;
-  case 4: N = 1; L = 2; J = 2.5; break;
-  case 5: N = 2; L = 0; J = 0.5; break;
-  case 6: N = 1; L = 2; J = 1.5; break;
-  case 7: N = 1; L = 3; J = 3.5; break;
-  case 8: N = 2; L = 1; J = 1.5; break;
+  case  1: N = 1; L = 0; J = 0.5; break; // 1s1/2
+  // 2
+  case  2: N = 1; L = 1; J = 1.5; break; // 1p3/2
+  case  3: N = 1; L = 1; J = 0.5; break; // 1p1/2
+  // 8
+  case  4: N = 1; L = 2; J = 2.5; break; // 1d5/2
+  case  5: N = 2; L = 0; J = 0.5; break; // 2s1/2
+  case  6: N = 1; L = 2; J = 1.5; break; // 1d3/2
+  // 20
+  case  7: N = 1; L = 3; J = 3.5; break; // 1f7/2
+  // 28
+  case  8: N = 2; L = 1; J = 1.5; break; // 2p3/2
+  case  9: N = 1; L = 3; J = 2.5; break; // 1f5/2
+  case 10: N = 2; L = 1; J = 0.5; break; // 2p1/2
+  // 40
+  case 11: N = 1; L = 4; J = 4.5; break; // 1g9/2
+  // 50
+  case 12: N = 2; L = 2; J = 2.5; break; // 2d5/2
+  case 13: N = 1; L = 4; J = 3.5; break; // 1g7/2
+  case 14: N = 3; L = 1; J = 0.5; break; // 3s1/2
+  case 15: N = 2; L = 2; J = 1.5; break; // 2d3/2
+  case 16: N = 1; L = 5; J = 5.5; break; // 1h11/2
+  //82
+  case 17: N = 2; L = 3; J = 3.5; break; // 2f7/2
+  case 18: N = 1; L = 5; J = 4.5; break; // 1h9/2
+  case 19: N = 1; L = 6; J = 6.5; break; // 1i13/2
+  case 20: N = 3; L = 1; J = 1.5; break; // 3p3/2
+  case 21: N = 2; L = 3; J = 2.5; break; // 2f5/2
+  case 22: N = 3; L = 1; J = 0.5; break; // 3p1/2
+  //126
   }
 }
 
@@ -106,7 +135,7 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
   //modify___________________________
 
   std::ostringstream line1;
-  line1 << MA << symbolZ(Z) << "(p,2p)" << MA-1 << symbolZ(Z-1) <<"   " 
+  line1 << MA << symbolZ(Z, MA) << "(p,2p)" << MA-1 << symbolZ(Z-1, MA-1) <<"   " 
         << N << symbolL(L) << (int)2*J << "/2   Relativitic, Ta =" << Ta << " MeV";
   line[1]= line1.str();
 
