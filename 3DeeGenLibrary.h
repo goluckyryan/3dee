@@ -18,7 +18,7 @@ double A00n0, Pn000, P0n00;
 const char* symbolL(int L);
 const char* symbolZ(int Z);
 void orbit(int ID, int &N, int &L, float &J);
-int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
+int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
 int read_outfile(int linePWIA);
 int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2);
 int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2);
@@ -65,7 +65,7 @@ void orbit(int ID, int &N, int &L, float &J){
   }
 }
 
-int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d){
+int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d){
 
   stringstream MAstr, ZAstr, Tastr, JAstr, JBstr, Nstr, Lstr, Jstr, BEstr, Tcstr, theta_cstr,theta_dstr, ang_dstr;
   MAstr << MA;
@@ -90,7 +90,8 @@ int make_infile(int MA, int Z, float JA, float JB, float Ta, int N, int L, float
   //read infile.temp___________________
   string line[19];
   ifstream file_in;
-  file_in.open("infile.2p.temp");
+  //file_in.open("infile.2p.temp");
+  file_in.open(filename.c_str());
 
   if (!file_in) {
     cerr << "Unable to open file infile";
@@ -183,7 +184,7 @@ int read_outfile(int linePWIA){
     exit(1);
   }
   
-  for(int i=1; i<nline; i++){
+  for(int i=0; i<nline; i++){
     getline(file_in,line[i]);
     if( file_in.eof() ) break;
   }
@@ -205,7 +206,7 @@ int read_outfile(int linePWIA){
 
 //  printf("----------1\n");
 
-  if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0) return 10;
+  if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0)  return 10;
 
   /* printf("%2d | %2d |%s \n", linePWIA   , line[linePWIA   ].length(), line[linePWIA].c_str());
      printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
@@ -232,11 +233,11 @@ int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2){
 
   //printf("------------------  T1:%9.3f ang1:%9.3f T2:%9.3f ang2:%8.3f \n", T1, theta1, T2, theta2);
 
-  if(T1 < 30 || T2<30 || T1>350 || T2 > 350) return 0;
+  if(T1 < 14 || T2<14 || T1>350 || T2 > 350) return 0;
 
-  if(theta1 < 20 || theta1 > 70) return 0;
+  if(theta1 < 17 || theta1 > 70) return 0;
 
-  if(theta2 < 20 || theta2 > 70) return 0;
+  if(theta2 < 17 || theta2 > 70) return 0;
 
   return 1;
 
@@ -247,7 +248,7 @@ int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta
   // return 1 for accepted, 0 for rejected
   bool debug = 0;
 
-  if(T1 < 30 || T2<30 || T1>350 || T2 > 350) return 0;
+  if(T1 < 14 || T2<14 || T1>400 || T2 > 400) return 0;
   theta1 = theta1/rad2deg;
   phi1   = phi1/rad2deg;
   theta2 = theta2/rad2deg;

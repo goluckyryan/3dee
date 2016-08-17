@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,17 +19,16 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 9) {
+  if(argc < 8) {
     printf("===============Generating Nucleus (p,pn) knockout data======================\n");
     printf("          Only for A(p,2p)O knockout [A(a,cd)b]\n");
-    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi option comment\n");
+    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi comment\n");
     printf("      MA : Mass number of isotop \n");
     printf("      Z  : charge number of isotop \n");
     printf("      BE : seperation energy \n");
     printf("     dTc : step of KE of proton 1 \n");
     printf("    dAng : step of ang of protons \n");
     printf("    dPhi : step of phi of protons \n");
-    printf("  option : 0 = full solid angle, 1 = SHARAQ04 acceptance \n"); 
     printf(" comment : comment \n");
     exit(0);
   }
@@ -50,7 +50,6 @@ int main(int argc, char *argv[]){
   int   TcStep = atoi(argv[4]);
   int  angStep = atoi(argv[5]);
   int  phiStep = atoi(argv[6]);
-  int  option  = atoi(argv[7]);
   
   int N = 0;
   int L = 0;
@@ -63,16 +62,11 @@ int main(int argc, char *argv[]){
 
   const int orbRange = 6;
   float TcStart = 30;
-  float TcEnd = 270;
+  float TcEnd = 350;
   float angcRange = 180;
   float angdRange = 180;
   float phicRange = 16; //+-
   float phidRange = 16; //+-
-
-  if ( option == 0 ){
-    phicRange = 90;
-    phidRange = 90;
-  }
 
   int totCount = 0;
 
@@ -99,7 +93,7 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/xsec_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%1d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep, option, argv[8]);
+  sprintf(filename, "../result/3d_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep, phiStep, argv[7]);
   
   //#############################  display input condition
   printf("===========================\n");
@@ -108,7 +102,6 @@ int main(int argc, char *argv[]){
   printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf(" Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
   printf(" angd step = %2d, phid Step = %2d, total loops = %10d \n", angStep, phiStep, totCount);
-  printf(" option = %1d \n", option);
   printf(" output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 
@@ -117,7 +110,7 @@ int main(int argc, char *argv[]){
   paraOut = fopen (filename, "w+");
   // file header
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
-  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f, option=%1d\n", Sp, Ti, option);
+  fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
   fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd); 
   fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcRange); 
   fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdRange);
@@ -181,7 +174,7 @@ int main(int argc, char *argv[]){
 
             // Accpetance Filter
             bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5]);
-            if (  option && jjj) {
+            if (jjj) {
               //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]);
               count+= orbRange;
               continue;
@@ -206,7 +199,7 @@ int main(int argc, char *argv[]){
                 //orbit
                 orbit(ID, N, L, J);
                 // make infile
-                make_infile(MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad);
+                make_infile("infile.2p.temp",MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad);
 
                 // run 3Dee code
                 system("./threedee infile");
@@ -214,8 +207,10 @@ int main(int argc, char *argv[]){
                 // read_outfile : xsec + Ay
                 // 57 for Dirac
 		// 81 for Ogata
-                if (read_outfile(81) == 10) {
-			printf("Please adjust the read Line.\n");		
+                //if (read_outfile(81) == 10){
+                if (read_outfile(57) == 10) {
+			printf("READ outfile ERROR ==========> Please adjust the read Line, or revisit infile\n");
+			exit(1);
 			continue;
 		}
           
