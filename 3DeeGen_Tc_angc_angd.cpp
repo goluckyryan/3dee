@@ -20,8 +20,9 @@ int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
   if(argc != 8) {
-    printf("===============Generating Flourine (p,pn) knockout data======================\n");
-    printf("          Only for F(p,2p)O knockout [A(a,cd)b]\n");
+    printf("===============Generating (p,2p) knockout data======================\n");
+    printf("\e[33m  (p,2p) for A(a,cd)B, A = B + b knockout in normal kinematics \e[m\n");
+    printf("\e[32m  using infile.2p.temp \e[m\n");
     printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z Ti BE dTc dAng comment \n");
     printf("      MA = Mass number of isotop \n");
     printf("      Z  = charge number of isotop \n");
@@ -34,8 +35,9 @@ int main(int argc, char *argv[]){
   }
 
   //##################### variables
+  string temp_file = "infile.2p.temp";
+  
   int MA   = atoi(argv[1]);
-
   int Z = atoi(argv[2]);
   float Ti = atof(argv[3]);  
   float Sp = atof(argv[4]);
@@ -78,7 +80,10 @@ int main(int argc, char *argv[]){
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z, MA), MA-1, symbolZ(Z-1, MA-1));
   printf("Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf("JA = %3.1f,  JB = %3.1f\n", JA, JB);
-  printf("Tc step = %2d MeV, angc step = %2d,  angd step = %2d, total loops = %10d \n", TcStep, angStep, angStep, totCount);
+  printf("Tc step  :%4d MeV, Range (%3d, %3d)\n", TcStep, TcStart, TcEnd); 
+  printf("angc step:%4d deg, Range (%3d, %3d)\n", angStep, angcStart, angcEnd); 
+  printf("angd step:%4d deg, Range (%3d, %3d)\n", angStep, angdStart, angdEnd); 
+  printf("total loops = %10d \n", totCount);
   printf(" output: %s \n", filename);  
   printf("------------------------------------------------------\n");
 
@@ -89,8 +94,8 @@ int main(int argc, char *argv[]){
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB);
   fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti);
   fprintf(paraOut, "#X%15s%2d MeV, Range (%6.1f, %6.1f)\n", "Tc step =", TcStep, TcStart, TcEnd+TcStart); 
-  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, 0, angcEnd); 
-  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, 0, angdEnd); 
+  fprintf(paraOut, "#Y%15s%2d deg, Range (%6.1f, %6.1f)\n", "angc step =", angStep, angcStart, angcEnd); 
+  fprintf(paraOut, "#Z%15s%2d deg, Range (%6.1f, %6.1f)\n", "angd step =", angStep, angdStart, angdEnd); 
   int numVar = 7;
   fprintf(paraOut, "#%*s", 12*numVar,""); for (int ID = orbStart; ID<=orbEnd ; ID++) fprintf(paraOut, "%12s%12s", "DWIA", "A00n0") ; fprintf(paraOut, "\n");
   fprintf(paraOut, "#%12d", 1); for (int i = 2; i <= numVar+2*(orbEnd - orbStart+1) ; i ++) fprintf(paraOut, "%12d", i); fprintf(paraOut, "\n");
@@ -151,7 +156,7 @@ int main(int argc, char *argv[]){
             orbit(ID, N, L, J);
 
             // make infile
-            make_infile("infile.2p.temp", MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, 0);
+            make_infile(temp_file, MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, 0);
 
             // run 3Dee code
             system("./threedee infile");

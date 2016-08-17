@@ -90,6 +90,9 @@ string Nucleus_Name(int Z, int A){
     }
   else cout << "Unable to open mass03.txt \n";
 
+  // remove the space
+  if( isspace(name[0])) name.erase(0, 1);
+
   if (flag == 1){
     return name;
   }else{

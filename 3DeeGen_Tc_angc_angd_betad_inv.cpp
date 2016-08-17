@@ -19,14 +19,16 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 8) {
-    printf("===============Generating Nucleus (p,pn) knockout data======================\n");
-    printf("          Only for A(p,2p)O knockout [A(a,cd)b]\n");
-    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z BE dTc dAng dPhi comment\n");
+  if(argc != 9) {
+    printf("===============Generating Nucleus (p,2p) knockout data======================\n");
+    printf("\e[33m  (p,2p) for A(a,cd)B, A = B + b knockout in inverse kinematics \e[m\n");
+    printf("\e[32m  using infile.2p.temp \e[m\n");
+    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z Ti BE dTc dAng dPhi comment\n");
     printf("      MA : Mass number of isotop \n");
     printf("      Z  : charge number of isotop \n");
+    printf("      Ti : incident KE of a \n");
     printf("      BE : seperation energy \n");
-    printf("     dTc : step of KE of proton 1 \n");
+    printf("     dTc : step of KE of a \n");
     printf("    dAng : step of ang of protons \n");
     printf("    dPhi : step of phi of protons \n");
     printf(" comment : comment \n");
@@ -34,26 +36,26 @@ int main(int argc, char *argv[]){
   }
 
   //##################### variables
+  string temp_file = "infile.2p.temp";
+  
   int MA   = atoi(argv[1]);
-  float Ti;
-  switch (MA) {
+  int Z = atoi(argv[2]);
+  float Ti = atof(argv[3]);
+  /*switch (MA) {
   case 14: Ti = 245.46; break;
   case 16: Ti = 200.0; break;
   case 22: Ti = 256.0; break;
   case 23: Ti = 289.44; break;
   case 25: Ti = 276.779; break;  
   default: Ti = 200.0; break;
-  }
-  
-  
+  }*/
 
-  int Z = atoi(argv[2]);
-  float Sp = atof(argv[3]);
-  int   TcStep = atoi(argv[4]);
-  int  angStep = atoi(argv[5]);
-  int  phiStep = atoi(argv[6]);
+  float Sp = atof(argv[4]);
+  int   TcStep = atoi(argv[5]);
+  int  angStep = atoi(argv[6]);
+  int  phiStep = atoi(argv[7]);
   
-  int N = 0;
+  int N = 1;
   int L = 0;
   float J = 0.5;
 
@@ -65,12 +67,12 @@ int main(int argc, char *argv[]){
   const int orbRange = 6;
   float TcStart = 30;
   float TcEnd = Ti-Sp;
-  float angcStart = 0;
-  float angcEnd = 180;
-  float angdStart = 0;
-  float angdEnd = 180;
-  float phicRange = 16; //+-
-  float phidRange = 16; //+-
+  float angcStart = 40;
+  float angcEnd   = 40;
+  float angdStart = 40;
+  float angdEnd   = 40;
+  float phicRange = 0; //+-
+  float phidRange = 0; //+-
 
   int totCount = 0;
 
@@ -97,13 +99,16 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/3d_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Sp,TcStep, angStep, phiStep, argv[7]);
+  sprintf(filename, "../result/3d_%2d%s_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Sp,TcStep, angStep, phiStep, argv[8]);
   
   //#############################  display input condition
   printf("===========================\n");
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z, MA), MA-1, symbolZ(Z-1, MA));
   printf(" Sp = %6.3f, Ti = %10.3f \n", Sp, Ti);
   printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
+  printf("Tc step  :%4d MeV, Range (%6.1f, %6.1f)\n", TcStep, TcStart, TcEnd+TcStart); 
+  printf("angc step:%4d deg, Range (%6.1f, %6.1f)\n", angStep, angcStart, angcEnd); 
+  printf("angd step:%4d deg, Range (%6.1f, %6.1f)\n", angStep, angdStart, angdEnd); 
   printf(" Tc step = %2d MeV, angc step = %2d,  phic step = %2d\n", TcStep, angStep, phiStep);
   printf(" angd step = %2d, phid Step = %2d, total loops = %10d \n", angStep, phiStep, totCount);
   printf(" output: %s \n", filename);  
@@ -146,7 +151,7 @@ int main(int argc, char *argv[]){
         for(float phic = -phicRange; phic<=phicRange; phic+=phiStep){
           for(float phid = -phidRange-180; phid<=phidRange-180; phid+=phiStep){
 
-            if( count % 600000 == 0 ) printf("count : %15d | Tc:%7.2f, angc:%7.2f, angd:%7.2f, phic:%7.2f, phid:%7.2f \n", count, Tc, angc, angd, phic, phid);
+            //if( count % 600000 == 0 ) printf("count : %15d | Tc:%7.2f, angc:%7.2f, angd:%7.2f, phic:%7.2f, phid:%7.2f \n", count, Tc, angc, angd, phic, phid);
 
             //refine phid
             float phid2 = 0;
@@ -203,7 +208,7 @@ int main(int argc, char *argv[]){
                 //orbit
                 orbit(ID, N, L, J);
                 // make infile
-                make_infile("infile.2p.temp",MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad);
+                make_infile(temp_file,MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad);
 
                 // run 3Dee code
                 system("./threedee infile");
