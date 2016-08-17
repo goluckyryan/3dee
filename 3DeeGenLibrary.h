@@ -232,11 +232,11 @@ int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2){
 
   //printf("------------------  T1:%9.3f ang1:%9.3f T2:%9.3f ang2:%8.3f \n", T1, theta1, T2, theta2);
 
-  if(T1 < 30 || T2<30 || T1>350 || T2 > 350) return 0;
+  if(T1 < 14 || T2<14 || T1>350 || T2 > 350) return 0;
 
-  if(theta1 < 20 || theta1 > 70) return 0;
+  if(theta1 < 17 || theta1 > 70) return 0;
 
-  if(theta2 < 20 || theta2 > 70) return 0;
+  if(theta2 < 17 || theta2 > 70) return 0;
 
   return 1;
 
@@ -247,7 +247,7 @@ int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta
   // return 1 for accepted, 0 for rejected
   bool debug = 0;
 
-  if(T1 < 30 || T2<30 || T1>350 || T2 > 350) return 0;
+  if(T1 < 14 || T2<14 || T1>400 || T2 > 400) return 0;
   theta1 = theta1/rad2deg;
   phi1   = phi1/rad2deg;
   theta2 = theta2/rad2deg;

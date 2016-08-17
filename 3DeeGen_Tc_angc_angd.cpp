@@ -19,15 +19,16 @@ using namespace std;
 int main(int argc, char *argv[]){
   time_t Tstart=time(0);
 
-  if(argc < 5) {
+  if(argc < 6) {
     printf("===============Generating Flourine (p,pn) knockout data======================\n");
     printf("          Only for F(p,2p)O knockout [A(a,cd)b]\n");
-    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z JA JB BE dTc dAngc dAngd\n");
+    printf("Usage: ./3DeeGee_Tc_angc_Td.o MA Z JA JB BE dTc dAng comment \n");
     printf("      MA = Mass number of isotop \n");
     printf("      Z  = charge number of isotop \n");
     printf("      BE = seperation energy \n");
     printf("     dTc = step of KE of proton 1 \n");
     printf("    dAng = step of ang_c/d of proton 1/2 \n");
+    printf("    comment \n");
     exit(0);
   }
 
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]){
   float JA = 1.0;
   float JB = 1.5;
 
-  const int orbRange = 4;
+  const int orbRange = 6;
   const int TcStart = 10;
   const int TcEnd   = 300;
   const int angcRange = 180;
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]){
   float *output = new float[9]; // knockout output 
 
   char filename[50];
-  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d.dat",  MA, symbolZ(Z), Sp,TcStep, angStep);
+  sprintf(filename, "../result/paraOut_%2d%s_Sp%04.1f_Tc%03d_ang%03d_%s.dat",  MA, symbolZ(Z), Sp,TcStep, angStep,argv[6]);
   
 //#############################  display input condition
   printf("===========================\n");
@@ -112,7 +113,7 @@ int main(int argc, char *argv[]){
   //########################### start looping
   int count = 0;
   int effCount = 0;
-  for (float Tc=TcStart; Tc <=TcEnd+TcStart; Tc+=TcStep){
+  for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){
     for (float angc = 0; angc<=angcRange; angc+=angStep){
         for(float angd = 0; angd<=angdRange; angd+=angStep){
 
@@ -159,7 +160,7 @@ int main(int argc, char *argv[]){
             if (read_outfile(57) == 10) continue;
           
             // save parameters + readout
-            fprintf(paraOut,"%12.6f%12.6f",DWIA ,A00n0); 
+            fprintf(paraOut,"%12.6f%12.6f",DWIA*1000. ,A00n0); 
 
             if ( DWIA > 1) printf("\e[31m");
             printf("                                                                DWIA(%1d%1s%1d/2):%14.10f \n", N, symbolL(L), (int)(2*J), DWIA);
@@ -170,6 +171,7 @@ int main(int argc, char *argv[]){
           }
           fprintf(paraOut, "\n");
       }
+      fflush(paraOut);
         //fprintf(paraOut,"\n");
     }
     //fprintf(paraOut,"\n");
