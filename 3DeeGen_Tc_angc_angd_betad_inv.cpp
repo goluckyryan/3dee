@@ -61,18 +61,18 @@ int main(int argc, char *argv[]){
   float JA = 1.0; 
   float JB = 1.5; 
  
-  bool runTHREEDEE = 1; 
+  bool runTHREEDEE = 0; 
 
   const int orbStart = 4;
   const int orbEnd   = 4; 
-  float TcStart   = 10; 
-  float TcEnd     = Ti-Sp;
+  float TcStart   = 100; 
+  float TcEnd     = 100;//Ti-Sp;
   float angcStart = 40; 
   float angcEnd   = 40;
   float angdStart = 40; 
   float angdEnd   = 40; 
-  float phicStart = -0;
-  float phicEnd   =  0;  
+  float phicStart =-20;
+  float phicEnd   = 20;  
   float phidStart = -0;
   float phidEnd   =  0;  
  
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
  
   float *output = new float[13]; // knockout output  
  
-  char filename[50]; 
+  char filename[200]; 
   sprintf(filename, "../result/3d_%2d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Ti, Sp,TcStep, angStep, phiStep, argv[8]); 
    
   //#############################  display input condition 
@@ -117,6 +117,7 @@ int main(int argc, char *argv[]){
   //####################### rewrite output file 
   FILE * paraOut; 
   paraOut = fopen (filename, "w+"); 
+
   // file header 
   fprintf(paraOut, "##A(a,cd)B = %2dF(p,2p)%2dO, JA=%3.1f  JB=%3.1f\n", MA, MA-1, JA, JB); 
   fprintf(paraOut, "##Sp=%6.3f, Ti=%9.3f\n", Sp, Ti); 
