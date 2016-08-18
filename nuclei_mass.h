@@ -92,6 +92,8 @@ string Nucleus_Name(int Z, int A){
 
   // remove the space
   if( isspace(name[0])) name.erase(0, 1);
+  if( isspace(name[1])) name.erase(1, 1);
+  if( isspace(name[2])) name.erase(2, 1);
 
   if (flag == 1){
     return name;

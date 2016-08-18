@@ -6,9 +6,10 @@
 #include <cmath>
 #include <cstring>
 #include "constant.h"
-//#include "3DeeGenLibrary.h"
+#include "3DeeGenLibrary.h"
 //#include "XsecTransform.h"
 #include "knockout2D.h"
+#include "nuclei_mass.h"
 //#include "knockout3D.h"
 
 using namespace std;
@@ -28,11 +29,18 @@ int main(int argc, char *argv[]){
   float phiNN = -18.994;
   float BE    = 13.26;
 
-  output = Knockout2D(Ma, Z, TKA, k, angk, angNN, BE);
+  cout << "---"<< Nucleus_Name(9,23) << "---"<<endl;
+
+  printf("%d---%3s----\n",23, Nucleus_Name(9,23).c_str());
+  printf("---%s----\n", symbolZ(9,23));
+  printf("---%s----\n", symbolZ(20,40));
+  printf("---%s----\n", symbolZ(50,120));
+
+  //output = Knockout2D(Ma, Z, TKA, k, angk, angNN, BE);
   
   //outputINV = Knockout2Dinv(Ma, Z, TKA, output[4], output[5], output[6], output[7]);
   //  outputINV = Knockout2Dinv3(Ma, Z, TKA, output[0], output[1], output[3], BE);
-  outputINV = Knockout3Dinv3(Ma, Z, TKA, 90, 80, 70, 2,  BE);
+  //outputINV = Knockout3Dinv3(Ma, Z, TKA, 90, 80, 70, 2,  BE);
 
 /*
   output = Knockout3D(Ma, Z,  TKA, k, angk, phik, angNN, phiNN, BE);

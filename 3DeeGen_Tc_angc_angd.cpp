@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
   float *output = new float[9]; // out output
 
   char filename[50];
-  sprintf(filename, "../result/3d_%2d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_%s.dat",  MA, symbolZ(Z,MA),Ti, Sp,TcStep, angStep,argv[7]);
+  sprintf(filename, "../result/3d_%d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_%s.dat",  MA, symbolZ(Z,MA),Ti, Sp,TcStep, angStep,argv[7]);
   
 //#############################  display input condition
   printf("===========================\n");
