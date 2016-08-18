@@ -1,9 +1,0 @@
-#!/bin/csh
-ln -sf ../dd_version/forces/dp.dat .
-ln -sf ../dd_version/forces .
-rm -f outfile
-../dd_version/poltgt/threedee
-rm -f fifteen
-rm -f sixteen
-rm -f plotfile
-
