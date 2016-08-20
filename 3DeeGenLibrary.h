@@ -251,7 +251,7 @@ int read_outfile(int linePWIA){
 
   Ay = Pn000;
    
-  printf("PWIA = %f, DWIA = %f, Ay = %f\n", PWIA, DWIA, Ay);
+  printf("\e[35m%30s PWIA = %f ub, DWIA = %f ub, Ay = %f\e[m\n","", PWIA*1000, DWIA*1000, Ay);
 
   return 0;
 }
