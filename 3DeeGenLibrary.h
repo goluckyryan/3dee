@@ -215,6 +215,26 @@ int read_outfile(int linePWIA){
   
   for(int i=0; i<nline; i++){
     getline(file_in,line[i]);
+
+
+    size_t pos = line[i].find("PWIA x-sec mb"); //get the last    
+    if( pos != std::string::npos){
+      PWIA = atof(line[i].substr(pos+13, 16).c_str());
+      //printf(" PWIA : %.10f \n", PWIA);
+    }
+
+    pos = line[i].find("DWIA x-sec mb"); //get the last    
+    if( pos != std::string::npos){
+      DWIA = atof(line[i].substr(pos+14, 16).c_str());
+      //printf(" DWIA : %.10f \n", DWIA);
+    }
+
+    pos = line[i].find("Scattered c Pn000"); //get the last    
+    if( pos != std::string::npos){
+      Pn000 = atof(line[i].substr(pos+35, 16).c_str());
+      //printf(" A00n0: %.10f \n", A00n0);
+    }
+
     if( file_in.eof() ) break;
   }
   
@@ -224,6 +244,7 @@ int read_outfile(int linePWIA){
 //    printf("%s\n", line[linePWIA+i].c_str());
 //  }
 
+/*
   int lineAdj = 0;
   if ( line[linePWIA].length() == 0){
     lineAdj = 1;
@@ -232,10 +253,10 @@ int read_outfile(int linePWIA){
   }
 
   linePWIA += lineAdj;
-
+*/
 //  printf("----------1\n");
 
-  if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0)  return 10;
+  //if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0)  return 10;
 
   /* printf("%2d | %2d |%s \n", linePWIA   , line[linePWIA   ].length(), line[linePWIA].c_str());
      printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
@@ -243,12 +264,13 @@ int read_outfile(int linePWIA){
      printf("%2d | %2d |%s \n", linePWIA+9 , line[linePWIA+9 ].length(), line[linePWIA+9].c_str());
      printf("%2d | %2d |%s \n", linePWIA+10, line[linePWIA+10].length(), line[linePWIA+10].c_str());
   */
+  /*
   PWIA  = atof((line[linePWIA]).substr(23,15).c_str());
   DWIA  = atof((line[linePWIA+3]).substr(23,15).c_str());
   A00n0 = atof((line[linePWIA+6]).substr(40,15).c_str());
   Pn000 = atof((line[linePWIA+9]).substr(40,15).c_str());
   P0n00 = atof((line[linePWIA+10]).substr(40,15).c_str());
-
+  */
   Ay = Pn000;
    
   printf("\e[35m%30s PWIA = %f ub, DWIA = %f ub, Ay = %f\e[m\n","", PWIA*1000, DWIA*1000, Ay);

@@ -1,10 +1,14 @@
+#include <istream> 
 #include <iostream>
-#include <string>
-#include <sstream>
-#include <cstdlib>
-#include <stdlib.h>
-#include <cmath>
-#include <cstring>
+#include <fstream> 
+#include <string> 
+#include <sstream> 
+#include <cstdlib> 
+#include <cmath> 
+#include <ctime> 
+#include <stdio.h> 
+#include <math.h> 
+#include <cstring> 
 #include "constant.h"
 #include "3DeeGenLibrary.h"
 //#include "XsecTransform.h"
@@ -15,7 +19,47 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
+  const int nline = 100;
+  string line[nline];
+  ifstream file_in;
+  file_in.open("outfile");
   
+  if (!file_in) {
+    printf("Unable to open outfile\n");
+    exit(1);
+  }
+
+  for(int i=0; i<nline; i++){
+    getline(file_in,line[i]);
+
+    size_t pos = line[i].find("PWIA x-sec mb"); //get the last    
+    if( pos != std::string::npos){
+      double PWIA = atof(line[i].substr(pos+13, 16).c_str());
+      printf(" PWIA : %.10f \n", PWIA);
+    }
+
+    pos = line[i].find("DWIA x-sec mb"); //get the last    
+    if( pos != std::string::npos){
+      double DWIA = atof(line[i].substr(pos+13, 16).c_str());
+      printf(" DWIA : %.10f \n", DWIA);
+    }
+
+    pos = line[i].find("Beam a A00n0"); //get the last    
+    if( pos != std::string::npos){
+      double A00n0 = atof(line[i].substr(pos+28, 16).c_str());
+      printf(" A00n0: %.10f \n", A00n0);
+    }
+
+
+    if( file_in.eof() ) break;
+  }
+
+  
+
+  
+  file_in.close();
+
+  /*
   float *output = new float[13]; // knockout output 
   float *outputINV = new float[13]; // knockout inver output
   

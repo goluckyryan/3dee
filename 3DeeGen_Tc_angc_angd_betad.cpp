@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
   } 
  
   //##################### variables
-  string temp_file = "infile.2p.temp";
+  string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
    
   int MA   = atoi(argv[1]); 
   int Z = atoi(argv[2]); 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
  
   bool runTHREEDEE = 1;
 
-  const int xIA = 1; // 1 = PWIA, 2 = DWIA
+  const int xIA = 2; // 1 = PWIA, 2 = DWIA
 
   const int orbStart = 4;
   const int orbEnd   = 4; 
@@ -111,6 +111,7 @@ int main(int argc, char *argv[]){
   printf("phid step:%4d deg, Range (%6.1f, %6.1f)\n", phiStep, phidStart, phidEnd);  
   printf(" orb start = %2d, orb End = %2d\n", orbStart, orbEnd); 
   printf(" total loops = %10d \n", totCount); 
+  printf(" using template : %s \n", temp_file.c_str());
   printf(" output: %s \n", filename);   
   printf("------------------------------------------------------\n"); 
  
@@ -269,6 +270,7 @@ int main(int argc, char *argv[]){
   printf("phid step:%4d deg, Range (%6.1f, %6.1f)\n", phiStep, phidStart, phidEnd);  
   printf(" output: %s \n", filename);   
   printf(" %s \n", comment);
+  printf(" using template : %s \n", temp_file.c_str());
   printf("------------------------------------------------------\n"); 
    
   return 0; 
