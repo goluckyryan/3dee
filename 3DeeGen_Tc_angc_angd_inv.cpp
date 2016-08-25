@@ -151,7 +151,7 @@ int main(int argc, char *argv[]){
             orbit(ID, N, L, J);
 
             // make infile
-            make_infile("infile.2p.temp",MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, 0);
+            make_infile("infile.2p.temp",MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, 0, 6.);
 
             // run 3Dee code
             system("./threedee infile");

@@ -19,7 +19,8 @@ double A00n0, Pn000, P0n00;
 const char* symbolL(int L);
 const char* symbolZ(int Z, int A);
 void orbit(int ID, int &N, int &L, float &J);
-int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d);
+float phi3D(float phid);
+int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d, float Vso);
 int read_outfile(int linePWIA);
 int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2);
 int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2);
@@ -94,9 +95,23 @@ void orbit(int ID, int &N, int &L, float &J){
   }
 }
 
-int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d){
+float phi3D(float phid){
+  float phid2 = 0;
 
-  stringstream MAstr, ZAstr, Tastr, JAstr, JBstr, Nstr, Lstr, Jstr, BEstr, Tcstr, theta_cstr,theta_dstr, ang_dstr;
+  if(phid > 180) { 
+    phid2 = 360-phid;  
+  }else if(phid < -180){ 
+    phid2 = 360+phid; 
+  }else{ 
+    phid2 = phid; 
+  }
+
+  return phid2;
+}
+
+int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d, float Vso){
+
+  stringstream MAstr, ZAstr, Tastr, JAstr, JBstr, Nstr, Lstr, Jstr, BEstr, Tcstr, theta_cstr,theta_dstr, ang_dstr, Vsostr;
   MAstr << MA;
   ZAstr<<Z;
   Tastr<<Ta;
@@ -110,6 +125,7 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
   theta_cstr<<theta_c;
   theta_dstr<<theta_d;
   ang_dstr<<ang_d;
+  Vsostr<<Vso;
 
   if(theta_c <0){
     printf(" ### theta_c should be positive. \n");
@@ -171,9 +187,10 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
 
   //line14 BE
   int lengthBE=(BEstr.str()).length();
+  int lengthVso=(Vsostr.str()).length();
   line[14]=line[14].replace(0,10,"          "); //reset
-  line[14]= line[14].replace(40,lengthBE,BEstr.str());
-
+  line[14]=line[14].replace(40,lengthBE,BEstr.str());
+  line[14]=line[14].replace(70,lengthVso,Vsostr.str());
 
   //line17 Tc, theta_c, theta_d, ang_d
   int lengthTc=(Tcstr.str()).length();
