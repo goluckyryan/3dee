@@ -51,6 +51,8 @@ int main(int argc, char *argv[]){
   int  angStep = atoi(argv[6]); 
   int  phiStep = atoi(argv[7]); 
   char* comment = argv[8];
+
+  float Vso = 6;
    
   int N = 1; 
   int L = 0; 
@@ -211,7 +213,7 @@ int main(int argc, char *argv[]){
                 //set N, L, J according to orbit ID 
                 orbit(ID, N, L, J); 
                 // make infile 
-                make_infile(temp_file,MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad, 6.); 
+                make_infile(temp_file,MA, Z, JA, JB,  Ti, N, L, J, Sp, Tc, angc, -angd, betad, Vso); 
  
                 // run 3Dee code 
                 system("./threedee infile"); 
