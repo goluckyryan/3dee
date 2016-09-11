@@ -13,6 +13,7 @@ using namespace std;
 double DWIA;
 double PWIA;
 double Ay;
+double VN;
 double A00n0, Pn000, P0n00;
 
 //***********************************************************************************
@@ -252,6 +253,12 @@ int read_outfile(int linePWIA){
       //printf(" A00n0: %.10f \n", A00n0);
     }
 
+    pos = line[i].find("VN ="); //get the VN    
+    if( pos != std::string::npos){
+      VN = atof(line[i].substr(pos+4, 9).c_str());
+      //printf(" %s, VN: %.10f \n", line[i].c_str(), VN);
+    }
+
     if( file_in.eof() ) break;
   }
   
@@ -261,36 +268,9 @@ int read_outfile(int linePWIA){
 //    printf("%s\n", line[linePWIA+i].c_str());
 //  }
 
-/*
-  int lineAdj = 0;
-  if ( line[linePWIA].length() == 0){
-    lineAdj = 1;
-  }else if (line[linePWIA+3].length() == 0){
-    lineAdj = -1;
-  }
-
-  linePWIA += lineAdj;
-*/
-//  printf("----------1\n");
-
-  //if ( line[linePWIA+6].length()==0 || line[linePWIA+9].length()==0 || line[linePWIA+10].length()==0)  return 10;
-
-  /* printf("%2d | %2d |%s \n", linePWIA   , line[linePWIA   ].length(), line[linePWIA].c_str());
-     printf("%2d | %2d |%s \n", linePWIA+3 , line[linePWIA+3 ].length(), line[linePWIA+3].c_str());
-     printf("%2d | %2d |%s \n", linePWIA+6 , line[linePWIA+6 ].length(), line[linePWIA+6].c_str());
-     printf("%2d | %2d |%s \n", linePWIA+9 , line[linePWIA+9 ].length(), line[linePWIA+9].c_str());
-     printf("%2d | %2d |%s \n", linePWIA+10, line[linePWIA+10].length(), line[linePWIA+10].c_str());
-  */
-  /*
-  PWIA  = atof((line[linePWIA]).substr(23,15).c_str());
-  DWIA  = atof((line[linePWIA+3]).substr(23,15).c_str());
-  A00n0 = atof((line[linePWIA+6]).substr(40,15).c_str());
-  Pn000 = atof((line[linePWIA+9]).substr(40,15).c_str());
-  P0n00 = atof((line[linePWIA+10]).substr(40,15).c_str());
-  */
   Ay = Pn000;
    
-  printf("\e[35m%30s PWIA = %f ub, DWIA = %f ub, Ay = %f\e[m\n","", PWIA*1000, DWIA*1000, Ay);
+  printf("\e[35m%30s PWIA = %f ub, DWIA = %f ub, Ay = %f, VN = %f\e[m\n","", PWIA*1000, DWIA*1000, Ay, VN);
 
   return 0;
 }

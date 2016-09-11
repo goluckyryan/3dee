@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
   int  phiStep = atoi(argv[7]); 
   char* comment = argv[8];
 
-  float Vso = 6;
+  float Vso = 12;
    
   int N = 1; 
   int L = 0; 
@@ -69,10 +69,10 @@ int main(int argc, char *argv[]){
   const int orbEnd   = 4; 
   float TcStart   = 100; 
   float TcEnd     = 100;//Ti-Sp;
-  float angcStart = 0; 
+  float angcStart =  0; 
   float angcEnd   = 90;
-  float angdStart = 60; 
-  float angdEnd   = 60; 
+  float angdStart = 20; 
+  float angdEnd   = 20; 
   float phicStart =  0; // local angle
   float phicEnd   =  0;  
   float phidStart = -0; // local angle in 3D, it will change to global in Kinematics cal.
@@ -99,13 +99,13 @@ int main(int argc, char *argv[]){
   float *output = new float[13]; // knockout output  
  
   char filename[200]; 
-  //sprintf(filename, "../result/3d_%2d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Ti, Sp,TcStep, angStep, phiStep, comment); 
-  //sprintf(filename, "../test.dat");
+  sprintf(filename, "../result/3d_%2d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Ti, Sp,TcStep, angStep, phiStep, comment); 
+  //sprintf(filename, "../result/test.dat");
    
   //#############################  display input condition 
   printf("===========================\n"); 
   printf(" %d%s(p,2p)%d%s \n",MA, symbolZ(Z, MA), MA-1, symbolZ(Z-1, MA)); 
-  printf(" Sp = %6.3f, Ti = %10.3f \n", Sp, Ti); 
+  printf(" Sp = %6.3f, Ti = %10.3f, Vso = %6.3f \n", Sp, Ti, Vso); 
   printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
   printf("Tc step  :%4d MeV, Range (%6.1f, %6.1f)\n", TcStep, TcStart, TcEnd); 
   printf("angc step:%4d deg, Range (%6.1f, %6.1f)\n", angStep, angcStart, angcEnd); 
@@ -258,6 +258,7 @@ int main(int argc, char *argv[]){
   printf("tot count %d, count %d[%.1f%%], eff count %d[%.1f%%])\n",totCount,  count, count*100./totCount,effCount, effCount*100./totCount);
   printf("Totol run time %.0f sec = %.1f min = %.1f hr| speed:#%.2f(%.2f)/sec\n", difftime(Tend,Tstart),difftime(Tend,Tstart)/60,difftime(Tend,Tstart)/3600,count/difftime(Tend,Tstart),effCount/difftime(Tend,Tstart));    
   printf(" JA = %3.1f,  JB = %3.1f\n", JA, JB);
+  printf(" Vso = %6.3f \n", Vso); 
   printf(" orb start = %2d, orb End = %2d\n", orbStart, orbEnd); 
   printf("  Tc step:%4d MeV, Range (%6.1f, %6.1f)\n", TcStep, TcStart, TcEnd); 
   printf("angc step:%4d deg, Range (%6.1f, %6.1f)\n", angStep, angcStart, angcEnd); 
