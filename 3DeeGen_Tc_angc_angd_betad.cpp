@@ -63,16 +63,16 @@ int main(int argc, char *argv[]){
  
   bool runTHREEDEE = 1;
 
-  const int xIA = 1; // 1 = PWIA, 2 = DWIA
+  const int xIA = 2; // 1 = PWIA, 2 = DWIA
 
   const int orbStart = 4;
   const int orbEnd   = 4; 
-  float TcStart   = 100; 
-  float TcEnd     = 100;//Ti-Sp;
-  float angcStart =  0; 
-  float angcEnd   = 90;
-  float angdStart = 20; 
-  float angdEnd   = 20; 
+  float TcStart   = 20; 
+  float TcEnd     = Ti-Sp;
+  float angcStart = 40; 
+  float angcEnd   = 40;
+  float angdStart = 40; 
+  float angdEnd   = 40; 
   float phicStart =  0; // local angle
   float phicEnd   =  0;  
   float phidStart = -0; // local angle in 3D, it will change to global in Kinematics cal.
@@ -170,12 +170,13 @@ int main(int argc, char *argv[]){
             // use knockout2D.h to calculate Tc thetac and thetad; 
             int kineticCal  = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp, output); 
  
-            float betad = 0; 
+            float betad = output[6]; 
+            /*
             if(phid2 >= 0){ 
               betad = 180 + phic - phid2; 
             }else{ 
               betad = -180 + phic - phid2; 
-            } 
+            } */
              
             // Td is nan 
              
@@ -195,8 +196,8 @@ int main(int argc, char *argv[]){
             }/**/ 
  
             // print condition 
-            printf("\e[32m==== %d(%d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n", 
-                   count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12]); 
+            printf("\e[32m==== %d(%d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f, offplane:%7.3f\e[m\n", 
+                   count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12], output[6]); 
  
             printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n", 
                    output[0], output[1], output[2], output[3], output[4], output[5]); 

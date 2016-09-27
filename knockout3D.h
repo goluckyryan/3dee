@@ -421,7 +421,12 @@ int Knockout3Dinv3(int MA, int Z, float TKEA, float Tc, float theta_c, float phi
   output[4] = 180 - Theta(P2L)*rad2deg; // theta_2
   output[5] = Phi(P2L)*rad2deg;
 
-  output[6] = phi_c - phi_d;// offplane angle, rotation around Kd x(Ka x Kc)
+  //output[6] = asin(sin(output[4]*deg2rad)*sin((phi_c - phi_d)*deg2rad))*rad2deg;// offplane angle, rotation around Kd x(Ka x Kc)
+  output[6] = asin(sin(theta_d)*sin(phi_c - phi_d))*rad2deg;// offplane angle, rotation around Kd x(Ka x Kc)
+  
+  
+  //printf("phic:%f, phid:%f, thatad:%f, betad:%f\n", phi_c, phi_d, theta_d, output[6]);
+  
   output[7] = Td;
   
   output[8] = Momentum(Pk);//k

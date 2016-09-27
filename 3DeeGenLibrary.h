@@ -205,7 +205,12 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
   line[17]=line[17].replace(0,lengthTc,Tcstr.str());
   line[17]=line[17].replace(10,lengththeta_c,theta_cstr.str());
   line[17]=line[17].replace(20,lengththeta_d,theta_dstr.str());
-  line[17]=line[17].replace(30,lengthang_d, ang_dstr.str());
+//  line[17]=line[17].replace(30,lengthang_d, ang_dstr.str());
+
+  char betad[10];
+  sprintf(betad, "%-8.5f", ang_d);
+  //printf("============== %f, %s \n", ang_d, betad);
+  line[17]=line[17].replace(30,8, betad);
 
   // Save to infile
   ofstream file_out;
