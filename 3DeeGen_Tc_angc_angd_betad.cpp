@@ -13,7 +13,8 @@
 #include "nuclei_mass.h" 
 #include "3DeeGenLibrary.h"  
 
-const string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
+//const string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
+const string temp_file = "infile.2p.temp";
 const int xIA = 2; // 1 = PWIA, 2 = DWIA
 const bool runTHREEDEE = 1;
 const float Vso = 6;
