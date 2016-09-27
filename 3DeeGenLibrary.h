@@ -22,7 +22,7 @@ const char* symbolZ(int Z, int A);
 void orbit(int ID, int &N, int &L, float &J);
 float phi3D(float phid);
 int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, int N, int L, float J, float BE, float Tc, float theta_c, float theta_d, float ang_d, float Vso);
-int read_outfile(int linePWIA);
+int read_outfile();
 int AccpetanceFilter2D(float T1, float theta1, float T2, float theta2);
 int AccpetanceFilter3D(float T1, float theta1, float phi1, float T2, float theta2, float phi2);
 float mwdcY(float x);
@@ -42,19 +42,6 @@ const char* symbolL(int L){
 }
 
 const char* symbolZ(int Z, int A){
-/*
-  switch (Z){
-  case 1: return "H";break;
-  case 2: return "He";break;
-  case 3: return "Li";break;
-  case 4: return "Be";break;
-  case 5: return "B";break;
-  case 6: return "C";break;
-  case 7: return "N";break;
-  case 8: return "O";break;
-  case 9: return "F";break;
-  }
-*/
 
   string sym = Nucleus_Name(Z,A);
   return sym.c_str();
@@ -205,11 +192,9 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
   line[17]=line[17].replace(0,lengthTc,Tcstr.str());
   line[17]=line[17].replace(10,lengththeta_c,theta_cstr.str());
   line[17]=line[17].replace(20,lengththeta_d,theta_dstr.str());
-//  line[17]=line[17].replace(30,lengthang_d, ang_dstr.str());
 
   char betad[10];
   sprintf(betad, "%-8.5f", ang_d);
-  //printf("============== %f, %s \n", ang_d, betad);
   line[17]=line[17].replace(30,8, betad);
 
   // Save to infile
@@ -225,7 +210,7 @@ int make_infile(string filename, int MA, int Z, float JA, float JB, float Ta, in
 
 }
 
-int read_outfile(int linePWIA){
+int read_outfile(){
   const int nline = 100;
   string line[nline];
   ifstream file_in;
@@ -244,34 +229,38 @@ int read_outfile(int linePWIA){
     if( pos != std::string::npos){
       PWIA = atof(line[i].substr(pos+13, 16).c_str());
       //printf(" PWIA : %.10f \n", PWIA);
+    }else{
+      return 1;
     }
 
     pos = line[i].find("DWIA x-sec mb"); //get the last    
     if( pos != std::string::npos){
       DWIA = atof(line[i].substr(pos+14, 16).c_str());
       //printf(" DWIA : %.10f \n", DWIA);
+    }else{
+      return 1;
     }
 
     pos = line[i].find("Scattered c Pn000"); //get the last    
     if( pos != std::string::npos){
       Pn000 = atof(line[i].substr(pos+35, 16).c_str());
       //printf(" A00n0: %.10f \n", A00n0);
+    }else{
+      return 1;
     }
 
     pos = line[i].find("VN ="); //get the VN    
     if( pos != std::string::npos){
       VN = atof(line[i].substr(pos+4, 9).c_str());
       //printf(" %s, VN: %.10f \n", line[i].c_str(), VN);
+    }else{
+      return 1;
     }
 
     if( file_in.eof() ) break;
   }
   
   file_in.close();
-
-//  for( int i = 0; i< 10; i++){
-//    printf("%s\n", line[linePWIA+i].c_str());
-//  }
 
   Ay = Pn000;
    

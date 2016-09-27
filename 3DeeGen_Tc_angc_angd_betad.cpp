@@ -12,6 +12,11 @@
 #include "knockout3D.h" 
 #include "nuclei_mass.h" 
 #include "3DeeGenLibrary.h"  
+
+const string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
+const int xIA = 2; // 1 = PWIA, 2 = DWIA
+const bool runTHREEDEE = 1;
+const float Vso = 6;
  
 using namespace std; 
  
@@ -35,7 +40,6 @@ int main(int argc, char *argv[]){
   } 
  
   //##################### variables
-  string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
    
   int MA   = atoi(argv[1]); 
   int Z = atoi(argv[2]); 
@@ -46,38 +50,31 @@ int main(int argc, char *argv[]){
   case 25: Ti = 276.779; break;   
   }
 
-  float Sp = atof(argv[4]); 
-  int   TcStep = atoi(argv[5]); 
-  int  angStep = atoi(argv[6]); 
-  int  phiStep = atoi(argv[7]); 
+  float Sp      = atof(argv[4]); 
+  int   TcStep  = atoi(argv[5]); 
+  int  angStep  = atoi(argv[6]); 
+  int  phiStep  = atoi(argv[7]); 
   char* comment = argv[8];
-
-  float Vso = 12;
    
   int N = 1; 
   int L = 0; 
   float J = 0.5; 
- 
   float JA = 1.0; 
   float JB = 1.5; 
- 
-  bool runTHREEDEE = 1;
-
-  const int xIA = 2; // 1 = PWIA, 2 = DWIA
 
   const int orbStart = 4;
   const int orbEnd   = 4; 
-  float TcStart   = 20; 
+  float TcStart   =  20; 
   float TcEnd     = Ti-Sp;
-  float angcStart = 40; 
-  float angcEnd   = 40;
-  float angdStart = 40; 
-  float angdEnd   = 40; 
-  float phicStart =  0; // local angle
-  float phicEnd   =  0;  
-  float phidStart = -0; // local angle in 3D, it will change to global in Kinematics cal.
-  float phidEnd   =  0;  
- 
+  float angcStart =   0; 
+  float angcEnd   = 180;
+  float angdStart =   0; 
+  float angdEnd   = 180; 
+  float phicStart = -22; // local angle
+  float phicEnd   =  22;  
+  float phidStart = -22; // local angle in 3D, it will change to global in Kinematics cal.
+  float phidEnd   =  22;  
+
   int totCount = 0; 
  
   for (float Tc=TcStart; Tc <=TcEnd; Tc+=TcStep){ 
@@ -88,7 +85,6 @@ int main(int argc, char *argv[]){
             totCount += orbEnd - orbStart + 1; 
  
             //printf("Tc:%5.1f, theta_c:%5.1f, phi_c:%5.1f, theta_d:%5.1f, phi_d:%5.1f |", Tc, angc, phic, angd, phid); 
- 
             //printf(" totcount = %d\n", totCount); 
           } 
         } 
@@ -100,7 +96,6 @@ int main(int argc, char *argv[]){
  
   char filename[200]; 
   sprintf(filename, "../result/3d_%2d%s_Ti%04.0f_Sp%04.1f_Tc%03d_ang%03d_phi%03d_%s.dat",  MA, symbolZ(Z, MA), Ti, Sp,TcStep, angStep, phiStep, comment); 
-  //sprintf(filename, "../result/test.dat");
    
   //#############################  display input condition 
   printf("===========================\n"); 
@@ -170,16 +165,10 @@ int main(int argc, char *argv[]){
             // use knockout2D.h to calculate Tc thetac and thetad; 
             int kineticCal  = Knockout3Dinv3(MA, Z,  Ti, Tc, angc, phic, angd, phid2, Sp, output); 
  
+            // off-plane angle
             float betad = output[6]; 
-            /*
-            if(phid2 >= 0){ 
-              betad = 180 + phic - phid2; 
-            }else{ 
-              betad = -180 + phic - phid2; 
-            } */
-             
-            // Td is nan 
-             
+       
+            // chekc Td is nan 
             if ( kineticCal == 0 ||  isnan(output[7])) { 
               //printf(" --------- skipped due to impossible kinematic. \n"); 
               count += orbEnd - orbStart + 1; 
@@ -187,24 +176,24 @@ int main(int argc, char *argv[]){
             } 
  
             // Accpetance Filter
-            /*
             bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5]); 
             if (jjj) { 
               //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]); 
               count+= orbEnd; 
               continue; 
-            }/**/ 
+            } 
  
             // print condition 
-            printf("\e[32m==== %d(%d)[\e[31m%4.1f%%\e[32m]| Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f, offplane:%7.3f\e[m\n", 
-                   count, effCount, count*100./totCount, Tc, angc, phic, output[7], angd, phid2,  betad,  output[8], output[9], output[10], output[11], output[12], output[6]); 
- 
+            printf("\e[32m==== %d(%d)[\e[31m%4.1f%%\e[32m]| ", count, effCount, count*100./totCount);
+            printf("Tc:%5.1f angc:%5.1f phic:%5.1f Td:%5.1f angd:%5.1f phid:%6.1f| ", Tc, angc, phic, output[7], angd, phid2);
+            printf("betad:%5.1f, k:%7.3f, theta_k:%7.3f, phi_k:%7.3f, theta_NN:%7.3f, phi_NN:%7.3f\e[m\n", betad,  output[8], output[9], output[10], output[11], output[12]);
+                   
             printf("        T1:%9.3f, theta_1:%9.3f, phi_1:%9.3f, T2:%9.3f, theta_2:%9.3f, phi_2:%9.3f\n", 
-                   output[0], output[1], output[2], output[3], output[4], output[5]); 
+                           output[0], output[1], output[2], output[3], output[4], output[5]); 
           
             // save parameters + readout 
             fprintf(paraOut," %12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f%12.3f", 
-                    Tc, angc, phic, output[7], angd, phid2,  betad, output[8], output[9], output[10], output[11], output[12],output[0], output[1], output[2], output[3], output[4], output[5]);        
+                    Tc, angc, phic, output[7], angd, phid2,  betad, output[8], output[9], output[10], output[11], output[12],output[0], output[1], output[2], output[3], output[4], output[5]);
  
             for (int ID=orbStart; ID <=orbEnd; ID ++){ 
               count ++; 
@@ -220,11 +209,8 @@ int main(int argc, char *argv[]){
                 system("./threedee infile"); 
       
                 // read_outfile : xsec + Ay 
-                // 57 for Dirac 
-                // 81 for Ogata 
-                //if (read_outfile(81) == 10){ 
-                if (read_outfile(57) == 10) { 
-                  printf("READ outfile ERROR ==========> Please adjust the read Line, or revisit infile\n"); 
+                if (read_outfile() ) { 
+                  printf("READ outfile ERROR !!!!! \n"); 
                   exit(1); 
                   continue; 
                 } 
@@ -266,8 +252,8 @@ int main(int argc, char *argv[]){
   printf("angd step:%4d deg, Range (%6.1f, %6.1f)\n", angStep, angdStart, angdEnd);  
   printf("phic step:%4d deg, Range (%6.1f, %6.1f)\n", phiStep, phicStart, phicEnd); 
   printf("phid step:%4d deg, Range (%6.1f, %6.1f)\n", phiStep, phidStart, phidEnd);  
-  printf(" output: %s \n", filename);   
-  printf(" %s \n", comment);
+  printf("   output: %s \n", filename);   
+  printf("  comment: %s \n", comment);
   printf(" using template : %s \n", temp_file.c_str());
   printf("------------------------------------------------------\n"); 
    

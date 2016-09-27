@@ -162,7 +162,7 @@ int main(int argc, char *argv[]){
             system("./threedee infile");
      
             // read_outfile : xsec + Ay
-            if (read_outfile(57) == 10)  {
+            if (read_outfile() )  {
               //continue;
               DWIA = NAN;
               A00n0 = NAN;
