@@ -13,8 +13,12 @@
 #include "nuclei_mass.h" 
 #include "3DeeGenLibrary.h"  
 
-//const string temp_file = "infile.2p.EDAD1_NL_nLS.temp";
-const string temp_file = "infile.2p.temp";
+//const string temp_file = "infile.2p.EDAD1_NLc_noDarwin.temp";
+const string temp_file = "infile.2p.noDarwin.nonLocal.temp";
+//const string temp_file = "infile.2p.noDarwin.Local.temp";    
+//const string temp_file = "infile.2p.Darwin.nonLocal.temp";
+//const string temp_file = "infile.2p.Darwin.Local.temp";
+//const string temp_file = "infile.2p.temp";
 const int xIA = 2; // 1 = PWIA, 2 = DWIA
 const bool runTHREEDEE = 1;
 const float Vso = 6;
@@ -67,10 +71,10 @@ int main(int argc, char *argv[]){
   const int orbEnd   = 4; 
   float TcStart   =  20; 
   float TcEnd     = Ti-Sp;
-  float angcStart =   0; 
-  float angcEnd   = 180;
-  float angdStart =   0; 
-  float angdEnd   = 180; 
+  float angcStart =  30; 
+  float angcEnd   = 150;
+  float angdStart =  30;
+  float angdEnd   = 150; 
   float phicStart = -22; // local angle
   float phicEnd   =  22;  
   float phidStart = -22; // local angle in 3D, it will change to global in Kinematics cal.
@@ -82,7 +86,7 @@ int main(int argc, char *argv[]){
     for (float angc = angcStart; angc<=angcEnd; angc+=angStep){
       for(float angd = angdStart; angd<=angdEnd; angd+=angStep){ 
         for(float phic = phicStart; phic<=phicEnd; phic+=phiStep){ 
-          for(float phid = -phidStart-180; phid<=phidEnd-180; phid+=phiStep){ 
+          for(float phid = phidStart-180; phid<=phidEnd-180; phid+=phiStep){ 
             totCount += orbEnd - orbStart + 1; 
  
             //printf("Tc:%5.1f, theta_c:%5.1f, phi_c:%5.1f, theta_d:%5.1f, phi_d:%5.1f |", Tc, angc, phic, angd, phid); 
@@ -156,7 +160,7 @@ int main(int argc, char *argv[]){
     for (float angc = angcStart; angc<=angcEnd; angc+=angStep){ 
       for(float angd = angdStart; angd<=angdEnd; angd+=angStep){ 
         for(float phic = phicStart; phic<=phicEnd; phic+=phiStep){ 
-          for(float phid = phidStart-180; phid<=phidEnd-180; phid+=phiStep){ 
+          for(float phid = phidStart-180; phid<= phidEnd-180; phid+=phiStep){ 
  
             //if( count % 600000 == 0 ) printf("count : %15d | Tc:%7.2f, angc:%7.2f, angd:%7.2f, phic:%7.2f, phid:%7.2f \n", count, Tc, angc, angd, phic, phid); 
  
@@ -179,8 +183,9 @@ int main(int argc, char *argv[]){
             // Accpetance Filter
             bool jjj = !AccpetanceFilter3D(output[0], output[1], output[2], output[3], output[4], output[5]); 
             if (jjj) { 
-              //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]); 
-              count+= orbEnd; 
+              //printf(" Accpatance Filter, %2d|(%3.1f,%3.1f,%4.1f,%3.1f%4.1f), T1:%9.3f ang1:%9.3f phi1:%9.3f, T2:%9.3f ang2:%8.3f phi2:%8.3f \n",jjj, Tc, angc, phic,angd, phid2, output[0], output[1], output[2], output[3], output[4], output[5]);    
+              //printf("%d \n", count);
+              count += orbEnd - orbStart + 1; 
               continue; 
             } 
  

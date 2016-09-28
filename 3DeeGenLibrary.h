@@ -229,32 +229,24 @@ int read_outfile(){
     if( pos != std::string::npos){
       PWIA = atof(line[i].substr(pos+13, 16).c_str());
       //printf(" PWIA : %.10f \n", PWIA);
-    }else{
-      return 1;
     }
 
     pos = line[i].find("DWIA x-sec mb"); //get the last    
     if( pos != std::string::npos){
       DWIA = atof(line[i].substr(pos+14, 16).c_str());
       //printf(" DWIA : %.10f \n", DWIA);
-    }else{
-      return 1;
     }
 
     pos = line[i].find("Scattered c Pn000"); //get the last    
     if( pos != std::string::npos){
       Pn000 = atof(line[i].substr(pos+35, 16).c_str());
       //printf(" A00n0: %.10f \n", A00n0);
-    }else{
-      return 1;
     }
 
     pos = line[i].find("VN ="); //get the VN    
     if( pos != std::string::npos){
       VN = atof(line[i].substr(pos+4, 9).c_str());
       //printf(" %s, VN: %.10f \n", line[i].c_str(), VN);
-    }else{
-      return 1;
     }
 
     if( file_in.eof() ) break;
